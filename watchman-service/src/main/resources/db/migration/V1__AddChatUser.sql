@@ -13,7 +13,9 @@ create table chat_user
     welcome_message_id int,
     invite_message     varchar,
     linkedin_url       varchar,
-    rating             int
+    rating             int,
+    leave              boolean,
+    join_group_time      timestamp with time zone
 );
 ALTER TABLE chat_user
     ADD CONSTRAINT chat_user_pkey PRIMARY KEY (id);

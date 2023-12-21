@@ -8,6 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author Sergey Golitsyn
@@ -19,4 +20,6 @@ import java.util.Optional;
 public interface ChatUserRepository extends CrudRepository<ChatUser, Long> {
     @QueryHints(@QueryHint(name = HibernateHints.HINT_CACHEABLE, value = "true"))
     Optional<ChatUser> findByUserIdAndChatId(Long userId, Long chatId);
+
+    Set<ChatUser> findAllByNewUserTrueAndLeaveFalse();
 }

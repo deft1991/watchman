@@ -20,6 +20,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.time.Instant;
 import java.util.Optional;
 
 /**
@@ -54,13 +55,14 @@ public class JoinGroupProcessor implements ChatUpdateProcessor {
                     ChatUser chatUser;
                     if (optionalChatUser.isEmpty()){
                         chatUser = chatUserMapper.mapToEntity(user);
-                        chatUser.setNewUser(true);
                         chatUser.setChatId(chat.getId());
                         chatUser = chatUserService.save(chatUser);
                     } else{
                         chatUser = optionalChatUser.get();
                     }
-
+                    chatUser.setNewUser(true);
+                    chatUser.setLeave(false);
+                    chatUser.setJoinGroupTime(Instant.now());
 
                     String formatted = String.format(messageDictionary.getMessage(), user.getFirstName());
                     // Send an invite message

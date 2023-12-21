@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import java.time.Instant;
+
 /**
  * @author Sergey Golitsyn
  * created on 05.10.2023
@@ -37,5 +39,7 @@ public class ChatUser extends BaseEntity {
     private String inviteMessage;
     private String linkedinUrl;
     private int rating;
+    private boolean leave = false;
+    private Instant joinGroupTime; // use it to check exp time
 
 }

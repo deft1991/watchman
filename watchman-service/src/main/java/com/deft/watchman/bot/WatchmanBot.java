@@ -55,6 +55,7 @@ public class WatchmanBot extends AbilityBot {
         if (isLeftChat(update)) {
             chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
             chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
+            chatProcessorsMap.get(ProcessorType.LEAVE_GROUP).processUpdate(this, update);
         } else if (isJoinGroup(update)) {
             chatProcessorsMap.get(ProcessorType.JOIN_GROUP).processUpdate(this, update);
             chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
