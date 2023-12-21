@@ -6,6 +6,7 @@ import com.deft.watchman.processor.ChatUpdateProcessor;
 import com.deft.watchman.processor.ProcessorType;
 import com.deft.watchman.service.ChatUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.telegram.abilitybots.api.bot.AbilityBot;
@@ -28,6 +29,9 @@ public class WatchmanBot extends AbilityBot {
 
     private final Map<ProcessorType, ChatUpdateProcessor> chatProcessorsMap;
     private final ChatUserService chatUserService;
+
+    @Value("${telegram.bot.linkedin.enable:true}")
+    private boolean isNeedLinkedIn;
 
 
     public WatchmanBot(Environment environment, List<ChatUpdateProcessor> processors, ChatUserService chatUserService) {
@@ -68,7 +72,7 @@ public class WatchmanBot extends AbilityBot {
             if (chat.isGroupChat() || chat.isSuperGroupChat()) {
                 // Check if the user has written the welcome message
                 Long chatId = chat.getId();
-                if (isNewUser(userId, chatId) && isUserSentMessageWithTag(message) && isUserSentMessageWithLinkedInLink(message)) {
+                if (isNewUser(userId, chatId)) {
                     if (isUserSentMessageWithTag(message) && isUserSentMessageWithLinkedInLink(message)){
                         chatProcessorsMap.get(ProcessorType.VALIDATE_FIRST_MESSAGE).processUpdate(this, update);
                         chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
@@ -101,7 +105,7 @@ public class WatchmanBot extends AbilityBot {
 
     private boolean isUserSentMessageWithLinkedInLink(Message message) {
         // todo move to db constant
-        return message.getText().toLowerCase().contains("https://www.linkedin.com/in/");
+        return isNeedLinkedIn || message.getText().toLowerCase().contains("https://www.linkedin.com/in/");
     }
 
     private static boolean isJoinGroup(Update update) {

@@ -1,6 +1,7 @@
 package com.deft.watchman.service.impl;
 
 import com.deft.watchman.service.LinkedInLinkParserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.Matcher;
@@ -13,6 +14,10 @@ import java.util.regex.Pattern;
 
 @Service
 public class LinkedInLinkParserServiceImpl implements LinkedInLinkParserService {
+
+    @Value("${telegram.bot.linkedin.enable:true}")
+    private boolean isNeedLinkedIn;
+
     @Override
     public String extractLinkedInProfileLink(String input) {
         // Regular expression to match LinkedIn profile links
