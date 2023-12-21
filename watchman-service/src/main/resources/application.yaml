@@ -1,0 +1,60 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /watcher
+
+spring:
+  thread-executor: virtual
+  application:
+    name: watcher-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/watcher_server
+    username: watcher_server
+    password: watcher_server
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        use_sql_comments: true
+        format_sql: true
+        generate_statistics: true
+        session.events.log: true
+        cache:
+          use_query_cache: true
+          use_second_level_cache: true
+          region:
+            factory_class: org.redisson.hibernate.RedissonRegionFactory
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+
+  # End Gateway Configuration
+
+logging:
+  level:
+    root: ERROR
+    com:
+      deft: DEBUG
+    org:
+      springframework:
+        security: DEBUG
+      hibernate:
+        SQL: DEBUG
+        cache: DEBUG
+        stat: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+telegram:
+  bot:
+    token: 6952175297:AAH_-ACex5wv2kpRO7CXWhyb8B1Pe9aaVMs
+    userName: "Суровый Вахтер"

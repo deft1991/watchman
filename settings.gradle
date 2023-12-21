@@ -1,0 +1,3 @@
+rootProject.name = 'watchman'
+
+include 'watchman-service'
