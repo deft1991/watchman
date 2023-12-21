@@ -22,6 +22,9 @@ ext {
     telegramBotVersion = "6.8.0"
     flywayVersion = "9.22.3"
     tomcatVersion = "11.0.0-M12"
+    redisHibernateVersion = "3.25.1"
+    mapstructVersion = "1.5.5.Final"
+    lombokMapstructBindingVersion = "0.2.0"
 }
 
 dependencies {
@@ -46,7 +49,7 @@ subprojects {
     apply plugin: 'java-library'
     apply plugin: 'java'
 
-    group = 'com.altosai'
+    group = 'com.deft'
     version = '0.0.1-SNAPSHOT'
     sourceCompatibility = '21'
 
@@ -73,11 +76,26 @@ subprojects {
         annotationProcessor 'org.projectlombok:lombok'
 
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+        /*
+        START Mapstruct and lombok
+        */
+        implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+        /*
+           this example uses lombok directly over the annotationProcessor,
+           the io.freefair.lombok plugin works as well.
+           The freefair-lombok plugin is used in the example mapstruct-on-gradle-testcp-with-lombok
+        */
+        annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+        annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+        /*
+            End Mapstruct and lombok
+         */
     }
 
 }
 
 springBoot {
-    mainClass = 'com.altosai.starter.ModuleApiApplication'
+    mainClass = 'com.deft.watchman.WatchmanApplication'
 }
 

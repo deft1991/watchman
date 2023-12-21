@@ -14,9 +14,24 @@ public class WatchmanApplication {
         ConfigurableApplicationContext ctx = SpringApplication.run(WatchmanApplication.class, args);
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            botsApi.registerBot(ctx.getBean("pizzaBot", AbilityBot.class));
+            botsApi.registerBot(ctx.getBean("watchmanBot", AbilityBot.class));
         } catch (TelegramApiException ex) {
             throw new RuntimeException(ex);
         }
     }
+
+//    public static void main(String[] args) {
+//        JoinEventBot joinEventBot = new JoinEventBot();
+//        joinEventBot.botConnect();
+//    }
+//
+//    private void botConnect() {
+//        TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
+//
+//        try {
+//            telegramBotsApi.registerBot(this);
+//        } catch (TelegramApiException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }
