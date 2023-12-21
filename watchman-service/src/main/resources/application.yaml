@@ -53,8 +53,3 @@ logging:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
-
-telegram:
-  bot:
-    token: 6952175297:AAH_-ACex5wv2kpRO7CXWhyb8B1Pe9aaVMs
-    userName: "Суровый Вахтер"
