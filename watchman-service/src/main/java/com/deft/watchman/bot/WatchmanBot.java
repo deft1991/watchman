@@ -91,14 +91,6 @@ public class WatchmanBot extends AbilityBot {
             if (EnumUtils.isValidEnum(CommandType.class, command)) {
                 commandProcessorMap.get(CommandType.valueOf(command.toUpperCase())).processCommand(this, update);
             }
-            // todo
-            //  support command
-            //  help --> list of commands
-            //  top --> top 5
-            //  top_speaker --> top 5 speakers
-            //  top_reply_to -->
-            //  top_reply_from -->
-            //  add_rating userName --> add rating to user name
         } else if (isLeftChat(update)) {
             chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
             chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);

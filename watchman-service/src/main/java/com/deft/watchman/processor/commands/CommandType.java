@@ -17,7 +17,8 @@ public enum CommandType {
     TOP_SPEAKER("Show TOP 5 Speakers"),
     TOP_REPLY_TO("Show TOP 5 users who likes to reply on messages"),
     TOP_REPLY_FROM("Show TOP 5 users who wrote the most answered messages"),
-    ADD_RATING("Show TOP 5 users with the highest rate");
+    ADD_RATING("Add Rating to user. Format /add_rating @user_name"),
+    TOP_RATING("Show TOP 5 users with the highest rate");
 
     private final String description;
 }

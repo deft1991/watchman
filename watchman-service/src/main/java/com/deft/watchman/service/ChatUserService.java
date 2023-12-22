@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface ChatUserService {
 
     Optional<ChatUser> findByUserIdAndChatId(Long userId, Long chatId);
+
+    Optional<ChatUser> findByUserNameAndChatId(String userName, long chatId);
     ChatUser save(ChatUser chatUser);
 
     ChatUser createOldUser(User user, Long chatId);

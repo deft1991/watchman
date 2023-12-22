@@ -36,6 +36,11 @@ public class ChatUserServiceImpl implements ChatUserService {
     }
 
     @Override
+    public Optional<ChatUser> findByUserNameAndChatId(String userName, long chatId) {
+        return chatUserRepository.findByUserNameAndChatId(userName, chatId);
+    }
+
+    @Override
     public ChatUser save(ChatUser chatUser) {
         return chatUserRepository.save(chatUser);
     }
