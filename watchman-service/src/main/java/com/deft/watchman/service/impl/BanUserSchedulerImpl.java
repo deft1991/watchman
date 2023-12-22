@@ -39,7 +39,7 @@ public class BanUserSchedulerImpl implements BanUserScheduler {
 
     @Override
     @Async
-    @Scheduled(fixedDelay = 1000 * 60)
+    @Scheduled(fixedDelay = 1000 * 60 * 10)
     public void banUser() {
         Set<ChatUser> allByNewUserTrue = chatUserRepository.findAllByNewUserTrueAndLeaveFalse();
         for (ChatUser chatUser : allByNewUserTrue) {

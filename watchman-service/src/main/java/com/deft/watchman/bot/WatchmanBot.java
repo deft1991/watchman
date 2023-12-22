@@ -15,7 +15,9 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -52,6 +54,25 @@ public class WatchmanBot extends AbilityBot {
      */
     @Override
     public void onUpdateReceived(Update update) {
+        if (update.hasEditedMessage()) {
+            Message message = update.getEditedMessage();
+            Chat chat = message.getChat();
+            User fromUser = message.getFrom();
+            Long userId = fromUser.getId();
+            Long chatId = chat.getId();
+            if (chat.isGroupChat() || chat.isSuperGroupChat()) {
+                if (isNewUser(userId, chatId)) {
+                    if (isUserSentMessageWithTag(message) && isNeedLinkedIn && isUserSentMessageWithLinkedInLink(message)) {
+                        chatProcessorsMap.get(ProcessorType.VALIDATE_FIRST_MESSAGE).processUpdate(this, update);
+                        chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
+                    } else {
+                        chatProcessorsMap.get(ProcessorType.BAN_CHAT_MEMBER).processUpdate(this, update);
+                        chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
+                        chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
+                    }
+                }
+            }
+        }
         if (!update.hasMessage()) {
             return;
         }
@@ -72,21 +93,47 @@ public class WatchmanBot extends AbilityBot {
             if (chat.isGroupChat() || chat.isSuperGroupChat()) {
                 // Check if the user has written the welcome message
                 Long chatId = chat.getId();
+                /*
+                if new user
+                - check if message has TAG
+                - if no ban user
+                - if so - then check linked in link in message
+                 todo - I need to do it more flexible. I don't like a lot of if cases
+                 */
                 if (isNewUser(userId, chatId)) {
-                    if (isUserSentMessageWithTag(message) && isUserSentMessageWithLinkedInLink(message)){
-                        chatProcessorsMap.get(ProcessorType.VALIDATE_FIRST_MESSAGE).processUpdate(this, update);
+                    if (isUserSentMessageWithTag(message)) {
+                        if (!isNeedLinkedIn || isUserSentMessageWithLinkedInLink(message)) {
+                            chatProcessorsMap.get(ProcessorType.VALIDATE_FIRST_MESSAGE).processUpdate(this, update);
+                            chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
+                        } else if (isNeedLinkedIn) {
+                            chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
+                            chatProcessorsMap.get(ProcessorType.ADD_LINKEDIN).processUpdate(this, update);
+                        }
+                    } else {
+                        chatProcessorsMap.get(ProcessorType.BAN_CHAT_MEMBER).processUpdate(this, update);
+                        chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
                         chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
-                    } else if (isUserSentMessageWithTag(message)){
-                        // todo add message to add linkedIn link or will be banned
                     }
-                } else if (isNewUser(userId, chatId)) {
-                    chatProcessorsMap.get(ProcessorType.BAN_CHAT_MEMBER).processUpdate(this, update);
-                    chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
-                    chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
-                } else if (message.getText().toLowerCase().contains("#whois")) {
-                    // todo say that you were introduced
-                    //  try to reply introduce message
+                } else {
+                    Optional<ChatUser> optionalChatUser = chatUserService.findByUserIdAndChatId(userId, chatId);
+                    if (optionalChatUser.isEmpty()) {
+                        chatUserService.createOldUser(fromUser, chatId);
+                    }
+                    chatUserService.increaseMessageCount(userId, chatId);
+                    if (message.isReply()) {
+                        Message replyToMessage = message.getReplyToMessage();
+                        User replyToUser = replyToMessage.getFrom();
+                        Chat chat1 = replyToMessage.getChat();
 
+                        Long replyToUserId = replyToUser.getId();
+                        Optional<ChatUser> optionalReplyToUser = chatUserService.findByUserIdAndChatId(replyToUserId, chat1.getId());
+                        if (optionalReplyToUser.isEmpty()) {
+                            chatUserService.createOldUser(replyToUser, chat1.getId());
+                        }
+                        chatUserService.increaseReplyToCount(userId, chatId);
+
+                        chatUserService.increaseReplyFromCount(replyToUserId, chat1.getId());
+                    }
                 }
             }
         }
@@ -105,7 +152,7 @@ public class WatchmanBot extends AbilityBot {
 
     private boolean isUserSentMessageWithLinkedInLink(Message message) {
         // todo move to db constant
-        return isNeedLinkedIn || message.getText().toLowerCase().contains("https://www.linkedin.com/in/");
+        return message.getText().toLowerCase().contains("https://www.linkedin.com/in/");
     }
 
     private static boolean isJoinGroup(Update update) {

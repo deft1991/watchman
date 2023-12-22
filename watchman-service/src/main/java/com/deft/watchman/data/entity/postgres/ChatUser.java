@@ -41,5 +41,7 @@ public class ChatUser extends BaseEntity {
     private int rating;
     private boolean leave = false;
     private Instant joinGroupTime; // use it to check exp time
-
+    private long messageCount = 0;
+    private long replyToCount = 0;
+    private long replyFromCount = 0;
 }

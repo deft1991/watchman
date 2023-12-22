@@ -10,5 +10,6 @@ public enum ProcessorType {
     JOIN_GROUP,
     VALIDATE_FIRST_MESSAGE,
     BAN_CHAT_MEMBER,
-    LEAVE_GROUP
+    LEAVE_GROUP,
+    ADD_LINKEDIN,
 }

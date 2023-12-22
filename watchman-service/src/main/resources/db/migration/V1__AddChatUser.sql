@@ -15,7 +15,10 @@ create table chat_user
     linkedin_url       varchar,
     rating             int,
     leave              boolean,
-    join_group_time      timestamp with time zone
+    join_group_time    timestamp with time zone,
+    message_count      bigint,
+    reply_to_count     bigint,
+    reply_from_count   bigint
 );
 ALTER TABLE chat_user
     ADD CONSTRAINT chat_user_pkey PRIMARY KEY (id);
@@ -48,3 +51,8 @@ INSERT INTO message_dictionary (id, type, message)
 VALUES (gen_random_uuid(),
         'WELCOME_MESSAGE',
         'Welcome to the group %s!');
+
+INSERT INTO message_dictionary (id, type, message)
+VALUES (gen_random_uuid(),
+        'ADD_LINKEDIN_MESSAGE',
+        'Hi there %s, you have to add linkedIn URL. Without it you will be banned. Please change your message with #whois tag');

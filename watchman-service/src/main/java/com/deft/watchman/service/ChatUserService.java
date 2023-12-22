@@ -1,6 +1,7 @@
 package com.deft.watchman.service;
 
 import com.deft.watchman.data.entity.postgres.ChatUser;
+import org.telegram.telegrambots.meta.api.objects.User;
 
 import java.util.Optional;
 
@@ -12,4 +13,12 @@ public interface ChatUserService {
 
     Optional<ChatUser> findByUserIdAndChatId(Long userId, Long chatId);
     ChatUser save(ChatUser chatUser);
+
+    ChatUser createOldUser(User user, Long chatId);
+
+    void increaseMessageCount(Long userId, Long chatId);
+
+    void increaseReplyToCount(Long userId, Long chatId);
+
+    void increaseReplyFromCount(Long userId, Long chatId);
 }
