@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.BanChatMember;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.time.Instant;
 import java.util.Set;
@@ -58,16 +57,8 @@ public class BanUserSchedulerImpl implements BanUserScheduler {
                         .chatId(chatUser.getChatId())
                         .messageId(chatUser.getWelcomeMessageId())
                         .build();
-                try {
-                    watchmanBot.execute(deleteMessage);
-                } catch (TelegramApiException e) {
-                    log.error("Err: {}", e.getMessage());
-                }
-                try {
-                    watchmanBot.execute(kickChatMember);
-                } catch (TelegramApiException e) {
-                    log.error("Err: {}", e.getMessage());
-                }
+                watchmanBot.silent().execute(deleteMessage);
+                watchmanBot.silent().execute(kickChatMember);
             }
         }
     }

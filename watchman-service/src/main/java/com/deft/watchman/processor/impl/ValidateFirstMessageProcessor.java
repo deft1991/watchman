@@ -20,7 +20,6 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Optional;
 
@@ -75,11 +74,7 @@ public class ValidateFirstMessageProcessor implements ChatUpdateProcessor {
                 .chatId(chat.getId().toString())
                 .text(formatted)
                 .build();
-        try {
-            bot.execute(inviteMessage);
-        } catch (TelegramApiException e) {
-            log.error("Err: {}", e.getMessage());
-        }
+        bot.silent().execute(inviteMessage);
     }
 
     @NotNull

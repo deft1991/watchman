@@ -10,7 +10,6 @@ import org.telegram.abilitybots.api.bot.AbilityBot;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 /**
  * @author Sergey Golitsyn
@@ -35,11 +34,7 @@ public class DeleteMessageProcessor implements ChatUpdateProcessor {
                 .chatId(message.getChatId())
                 .messageId(message.getMessageId())
                 .build();
-        try {
-            bot.execute(deleteMessage);
-        } catch (TelegramApiException e) {
-            log.error("Err: {}", e.getMessage());
-        }
+        bot.silent().execute(deleteMessage);
     }
 
     @Override

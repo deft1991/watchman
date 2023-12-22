@@ -14,7 +14,8 @@ public class WatchmanApplication {
         ConfigurableApplicationContext ctx = SpringApplication.run(WatchmanApplication.class, args);
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            botsApi.registerBot(ctx.getBean("watchmanBot", AbilityBot.class));
+            AbilityBot watchmanBot = ctx.getBean("watchmanBot", AbilityBot.class);
+            botsApi.registerBot(watchmanBot);
         } catch (TelegramApiException ex) {
             throw new RuntimeException(ex);
         }

@@ -4,8 +4,11 @@ package com.deft.watchman.bot;
 import com.deft.watchman.data.entity.postgres.ChatUser;
 import com.deft.watchman.processor.ChatUpdateProcessor;
 import com.deft.watchman.processor.ProcessorType;
+import com.deft.watchman.processor.commands.CommandProcessor;
+import com.deft.watchman.processor.commands.CommandType;
 import com.deft.watchman.service.ChatUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -30,18 +33,23 @@ import java.util.stream.Collectors;
 public class WatchmanBot extends AbilityBot {
 
     private final Map<ProcessorType, ChatUpdateProcessor> chatProcessorsMap;
+    private final Map<CommandType, CommandProcessor> commandProcessorMap;
     private final ChatUserService chatUserService;
 
     @Value("${telegram.bot.linkedin.enable:true}")
     private boolean isNeedLinkedIn;
 
 
-    public WatchmanBot(Environment environment, List<ChatUpdateProcessor> processors, ChatUserService chatUserService) {
+    public WatchmanBot(Environment environment,
+                       List<ChatUpdateProcessor> processors,
+                       ChatUserService chatUserService,
+                       List<CommandProcessor> commandProcessors) {
         super(environment.getProperty("telegram.bot.token"), environment.getProperty("telegram.bot.userName"));
-
         chatProcessorsMap = processors.stream()
                 .collect(Collectors.toMap(ChatUpdateProcessor::getProcessorType, p -> p));
         this.chatUserService = chatUserService;
+        commandProcessorMap = commandProcessors.stream()
+                .collect(Collectors.toMap(CommandProcessor::getProcessorType, p -> p));
     }
 
     @Override
@@ -76,8 +84,22 @@ public class WatchmanBot extends AbilityBot {
         if (!update.hasMessage()) {
             return;
         }
-
-        if (isLeftChat(update)) {
+        if (update.getMessage().isCommand()) {
+            Message message = update.getMessage();
+            String text = message.getText() + " ";
+            String command = text.substring(1, text.indexOf(" ")).toUpperCase();
+            if (EnumUtils.isValidEnum(CommandType.class, command)) {
+                commandProcessorMap.get(CommandType.valueOf(command.toUpperCase())).processCommand(this, update);
+            }
+            // todo
+            //  support command
+            //  help --> list of commands
+            //  top --> top 5
+            //  top_speaker --> top 5 speakers
+            //  top_reply_to -->
+            //  top_reply_from -->
+            //  add_rating userName --> add rating to user name
+        } else if (isLeftChat(update)) {
             chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
             chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
             chatProcessorsMap.get(ProcessorType.LEAVE_GROUP).processUpdate(this, update);
@@ -162,6 +184,5 @@ public class WatchmanBot extends AbilityBot {
     private static boolean isLeftChat(Update update) {
         return update.getMessage().getLeftChatMember() != null;
     }
-
 
 }

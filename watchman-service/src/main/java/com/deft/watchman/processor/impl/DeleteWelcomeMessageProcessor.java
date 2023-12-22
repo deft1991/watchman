@@ -13,7 +13,6 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Optional;
 
@@ -48,11 +47,7 @@ public class DeleteWelcomeMessageProcessor implements ChatUpdateProcessor {
                         .chatId(message.getChatId())
                         .messageId(chatUser.getWelcomeMessageId())
                         .build();
-                try {
-                    bot.execute(deleteWelcomeMessage);
-                } catch (TelegramApiException e) {
-                    log.error("Err: {}", e.getMessage());
-                }
+                bot.silent().execute(deleteWelcomeMessage);
             }
         }
     }

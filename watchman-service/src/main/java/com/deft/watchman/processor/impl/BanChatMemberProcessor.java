@@ -13,7 +13,6 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 /**
  * @author Sergey Golitsyn
@@ -46,11 +45,7 @@ public class BanChatMemberProcessor implements ChatUpdateProcessor {
                 .build();
         // todo save banned users in DB
 
-        try {
-            bot.execute(kickChatMember);
-        } catch (TelegramApiException e) {
-            log.error("Err: {}", e.getMessage());
-        }
+        bot.silent().execute(kickChatMember);
 
     }
 

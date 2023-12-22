@@ -18,7 +18,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -50,7 +49,6 @@ public class JoinGroupProcessor implements ChatUpdateProcessor {
         // Check if the new member joined the group
         if (chat.isGroupChat() || chat.isSuperGroupChat()) {
             message.getNewChatMembers().forEach(user -> {
-                try {
                     Optional<ChatUser> optionalChatUser = chatUserService.findByUserIdAndChatId(user.getId(), chat.getId());
                     ChatUser chatUser;
                     if (optionalChatUser.isEmpty()){
@@ -71,12 +69,11 @@ public class JoinGroupProcessor implements ChatUpdateProcessor {
                                 .chatId(chat.getId().toString())
                                 .text(formatted)
                                 .build();
-                        Message execute = bot.execute(inviteMessage);
-                        chatUser.setWelcomeMessageId(execute.getMessageId());
+                        Optional<Message> execute = bot.silent().execute(inviteMessage);
+                        if (execute.isPresent()){
+                            chatUser.setWelcomeMessageId(execute.get().getMessageId());
+                        }
                     }
-                } catch (TelegramApiException e) {
-                    log.error("Err: {}", e.getMessage());
-                }
             });
         }
     }
