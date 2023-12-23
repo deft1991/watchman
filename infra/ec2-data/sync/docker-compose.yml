@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  nginx-proxy:
+    image: nginx:stable-alpine
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    links:
+      - java-app
+    depends_on:
+      - java-app
+  java-app:
+    image: deft1991/watchman:latest
+    restart: always
+    environment:
+      - JVM_OPTS=-Xmx100m -Xms200m -XX:MaxPermSize=100m -XX:+UseSerialGC -Xss512k
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/aws/actuator/health"]
+      interval: 45s
+      timeout: 10s
+      retries: 5
+    

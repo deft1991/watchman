@@ -22,6 +22,7 @@ public interface ChatUserRepository extends CrudRepository<ChatUser, Long> {
     @QueryHints(@QueryHint(name = HibernateHints.HINT_CACHEABLE, value = "true"))
     Optional<ChatUser> findByUserIdAndChatId(Long userId, Long chatId);
 
+    @QueryHints(@QueryHint(name = HibernateHints.HINT_CACHEABLE, value = "true"))
     Optional<ChatUser> findByUserNameAndChatId(String username, Long chatId);
 
     Set<ChatUser> findAllByNewUserTrueAndLeaveFalse();

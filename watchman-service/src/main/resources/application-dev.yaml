@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://watchman.ct5pououdrhp.us-east-2.rds.amazonaws.com:5432/watcher_server
+    username: watcher_server
+    password: watcher_server
+  data:
+    redis:
+      host: watcher-ransh3.serverless.use2.cache.amazonaws.com
+      port: 6379
+#      password: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81

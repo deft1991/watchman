@@ -40,9 +40,9 @@ public class BanUserSchedulerImpl implements BanUserScheduler {
     @Async
     @Scheduled(fixedDelay = 1000 * 60 * 10)
     public void banUser() {
-        Set<ChatUser> allByNewUserTrue = chatUserRepository.findAllByNewUserTrueAndLeaveFalse();
+        Set<ChatUser> allByNewUserTrue = chatUserRepository.findAllByNewUserTrueAndLeaveFalse(); // todo select with timestamp
         for (ChatUser chatUser : allByNewUserTrue) {
-            if (chatUser.getJoinGroupTime().isBefore(Instant.now())) {
+            if (chatUser.getJoinGroupTime() != null && chatUser.getJoinGroupTime().isBefore(Instant.now())) {
 
                 chatUser.setLeave(true);
 
@@ -53,11 +53,13 @@ public class BanUserSchedulerImpl implements BanUserScheduler {
                         .build();
 
                 // todo save banned users in DB
-                DeleteMessage deleteMessage = DeleteMessage.builder()
-                        .chatId(chatUser.getChatId())
-                        .messageId(chatUser.getWelcomeMessageId())
-                        .build();
-                watchmanBot.silent().execute(deleteMessage);
+                if (chatUser.getWelcomeMessageId() != null) {
+                    DeleteMessage deleteMessage = DeleteMessage.builder()
+                            .chatId(chatUser.getChatId())
+                            .messageId(chatUser.getWelcomeMessageId())
+                            .build();
+                    watchmanBot.silent().execute(deleteMessage);
+                }
                 watchmanBot.silent().execute(kickChatMember);
             }
         }
