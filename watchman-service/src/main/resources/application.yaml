@@ -60,3 +60,10 @@ logging:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+telegram:
+  bot:
+    userName: "Суровый Вахтер"
+    ban-seconds: 60
+    linkedin:
+      enable: true

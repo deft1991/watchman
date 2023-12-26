@@ -10,10 +10,10 @@
 #  user_data                   = file("${path.module}/ec2-data/bootstrap.sh")
 #  user_data_replace_on_change = true
 #
-#  # Copy the docker-compose.yml and nginx.conf file to the instance
+#  # Copy the docker-compose.yaml and nginx.conf file to the instance
 #  provisioner "file" {
-#    source      = "${path.module}/ec2-data/sync/docker-compose.yml"
-#    destination = "/home/ec2-user/docker-compose.yml"
+#    source      = "${path.module}/ec2-data/sync/docker-compose.yaml"
+#    destination = "/home/ec2-user/docker-compose.yaml"
 #
 #    connection {
 #      type        = "ssh"

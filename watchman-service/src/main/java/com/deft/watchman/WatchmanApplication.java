@@ -21,18 +21,4 @@ public class WatchmanApplication {
         }
     }
 
-//    public static void main(String[] args) {
-//        JoinEventBot joinEventBot = new JoinEventBot();
-//        joinEventBot.botConnect();
-//    }
-//
-//    private void botConnect() {
-//        TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
-//
-//        try {
-//            telegramBotsApi.registerBot(this);
-//        } catch (TelegramApiException e) {
-//            e.printStackTrace();
-//        }
-//    }
 }
