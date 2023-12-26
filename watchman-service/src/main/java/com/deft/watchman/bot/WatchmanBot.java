@@ -71,7 +71,7 @@ public class WatchmanBot extends AbilityBot {
             if (chat.isGroupChat() || chat.isSuperGroupChat()) {
                 if (isNewUser(userId, chatId)) {
                     if (isUserSentMessageWithTag(message) && isNeedLinkedIn && isUserSentMessageWithLinkedInLink(message)) {
-                        chatProcessorsMap.get(ProcessorType.VALIDATE_FIRST_MESSAGE).processUpdate(this, update);
+                        chatProcessorsMap.get(ProcessorType.VALIDATE_EDIT_FIRST_MESSAGE).processUpdate(this, update);
                         chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
                     } else {
                         chatProcessorsMap.get(ProcessorType.BAN_CHAT_MEMBER).processUpdate(this, update);
@@ -80,11 +80,9 @@ public class WatchmanBot extends AbilityBot {
                     }
                 }
             }
-        }
-        if (!update.hasMessage()) {
+        } else if (!update.hasMessage()) {
             return;
-        }
-        if (update.getMessage().isCommand()) {
+        } else if (update.getMessage().isCommand()) {
             Message message = update.getMessage();
             String text = message.getText() + " ";
             String command = text.substring(1, text.indexOf(" ")).toUpperCase();

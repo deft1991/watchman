@@ -16,7 +16,7 @@ services:
     image: deft1991/watchman:latest
     restart: always
     environment:
-      - JVM_OPTS=-Xmx100m -Xms200m -XX:MaxPermSize=100m -XX:+UseSerialGC -Xss512k
+      JAVA_OPTS: "-Xmx512m -Xms256m -XX:MaxPermSize=100m -XX:+UseSerialGC -Xss512k"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/aws/actuator/health"]
       interval: 45s

@@ -25,7 +25,14 @@ spring:
           use_query_cache: true
           use_second_level_cache: true
           region:
-            factory_class: org.redisson.hibernate.RedissonRegionFactory
+            factory_class: org.hibernate.cache.jcache.internal.JCacheRegionFactory
+#            factory_class: org.redisson.hibernate.RedissonRegionFactory
+        javax:
+          cache:
+            provider: org.ehcache.jsr107.EhcacheCachingProvider
+            uri: ehcache.xml
+          missing_cache_strategy: fail
+
   data:
     redis:
       host: localhost

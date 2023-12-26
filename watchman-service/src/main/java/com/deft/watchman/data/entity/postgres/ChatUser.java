@@ -24,7 +24,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Cacheable
-@Cache(region = "ChatUserCache", usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(region = "defaultCache", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ChatUser extends BaseEntity {
 
     private Long userId;

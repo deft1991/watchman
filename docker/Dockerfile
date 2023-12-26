@@ -8,8 +8,8 @@ RUN gradle build
 
 FROM openjdk:22-slim
 
-COPY --from=builder /app/starter/build/libs/[^_]*.jar /app/app.jar
+COPY --from=builder /app/watchman-service/build/libs/[^_]*.jar /app/app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=dev,local","-jar","/app/app.jar"]
