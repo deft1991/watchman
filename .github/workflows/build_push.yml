@@ -13,7 +13,7 @@ on:
       - 'docker/**'
       - 'webui-user.sh'
     branches:
-      - 'main'
+      - 'develop'
     tags:
       - 'v*'
   pull_request:
