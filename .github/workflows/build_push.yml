@@ -9,9 +9,6 @@ on:
         required: false
         type: boolean
   push:
-#    paths:
-#      - 'docker/**'
-#      - 'webui-user.sh'
     branches:
       - 'develop'
     tags:
@@ -113,8 +110,6 @@ jobs:
           DOCKER_COMPOSE_FILE: ${{ steps.docker-compose-gen.outputs.DOCKER_COMPOSE_FILE }}
           DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
           DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-#          DOCKER_PASSWORD: ${{ secrets.DOCKER_API_TOKEN }}
-#          DOCKER_USERNAME: deft1991
           ENV_FILE: ${{ secrets.ENV_FILE }}
           NGINX_403_FILE: ${{ steps.docker-compose-gen.outputs.NGINX_403_FILE }}
           NGINX_502_FILE: ${{ steps.docker-compose-gen.outputs.NGINX_502_FILE }}
