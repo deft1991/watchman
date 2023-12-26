@@ -90,7 +90,7 @@ jobs:
           SCRIPT_DIR: "scripts"
           DOCKER_DIR: "docker"
         run: |
-          echo "Generate an updated docker-compose.yml file with new tag..."
+          echo "Generate an updated docker-compose.yaml file with new tag..."
           ./"$SCRIPT_DIR"/update_docker_image.sh "${API_IMAGE_NAME}:${API_IMAGE_TAG}"
           
           DOCKER_COMPOSE_FILE="$(yq -o=json '.' $DOCKER_DIR/compose.yaml)"
@@ -104,6 +104,9 @@ jobs:
           NGINX_502_FILE=$(cat "$DOCKER_DIR/proxy/502.html" | base64 -w 0)
           echo "NGINX_502_FILE="$(echo "$NGINX_502_FILE")"" >> "$GITHUB_OUTPUT"
 
+      # copy the content of your public key ~/.ssh/id_rsa.pub to your clipboard
+      # From your local computer ssh your remote host.
+      # nano ~/.ssh/authorized_keys and paste your public key to the next line. If the file does not exit you can create it.
       - name: Login to API instance and deploy a new image
         uses: appleboy/ssh-action@v1.0.0
         env:

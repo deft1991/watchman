@@ -12,8 +12,8 @@ resource "aws_instance" "web" {
 
   # Copy the docker-compose.yaml and nginx.conf file to the instance
   provisioner "file" {
-    source      = "${path.module}/ec2-data/sync/docker-compose.yml"
-    destination = "/home/ec2-user/docker-compose.yml"
+    source      = "${path.module}/ec2-data/sync/docker-compose.yaml"
+    destination = "/home/ec2-user/docker-compose.yaml"
 
     connection {
       type        = "ssh"
@@ -23,7 +23,7 @@ resource "aws_instance" "web" {
     }
   }
   provisioner "file" {
-    source      = "${path.module}/ec2-data/sync/nginx.conf"
+    source      = "${path.module}/ec2-data/sync/proxy/nginx.conf"
     destination = "/home/ec2-user/nginx.conf"
 
     connection {
