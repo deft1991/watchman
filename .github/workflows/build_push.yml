@@ -11,8 +11,6 @@ permissions:
 
 env:
   API_IMAGE_NAME: 'deft1991/watchman'
-  DOCKERFILE_NAME: 'Dockerfile'
-  DOCKERFILE_PATH: './docker/'
 
 jobs:
   build:
@@ -67,6 +65,9 @@ jobs:
       - uses: actions/checkout@v3
 
       # Login to ec2 and deploy the new images
+#      copy the content of your public key ~/.ssh/id_rsa.pub to your clipboard
+#      From your local computer ssh your remote host.
+#      nano ~/.ssh/authorized_keys and paste your public key to the next line. If the file does not exit you can create it.
       - name: Login to ec2 and deploy the new images
         uses: appleboy/ssh-action@master
         with:
