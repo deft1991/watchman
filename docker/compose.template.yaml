@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  postgres:
+    container_name: pg
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-watcher_server}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    expose:
+      - "5432:5432"
+    restart: unless-stopped
+  
+  api:
+    container_name: api
+    image: ${API_IMAGE}
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    env_file:
+      - .env
+    environment:
+      JAVA_OPTS: "-Xmx512m -Xms256m"
+      SPRING_PROFILES_ACTIVE: ${ENV:-dev}
+    expose:
+      - "8080:8080"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+  
+  nginx:
+    container_name: nginx
+    image: nginx:mainline-alpine-slim
+    restart: always
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./proxy/index.html:/usr/share/nginx/html/index.html:ro
+      - ./proxy/403.html:/usr/share/nginx/html/403.html:ro
+      - ./proxy/502.html:/usr/share/nginx/html/502.html:ro
+    ports:
+      - "80:80"
+
+volumes:
+  postgres:
+    name: postgres-data

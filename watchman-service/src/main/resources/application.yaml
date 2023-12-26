@@ -33,11 +33,11 @@ spring:
             uri: ehcache.xml
           missing_cache_strategy: fail
 
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      password: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+#  data:
+#    redis:
+#      host: localhost
+#      port: 6379
+#      password: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
 
   # End Gateway Configuration
 

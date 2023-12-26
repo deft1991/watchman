@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background: url('https://images.unsplash.com/photo-1696550579939-6d5134d4bfc1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Arial', sans-serif;
+            color: white;
+        }
+
+        .container {
+            background: rgba(0,0,0,0.7);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .jumbotron {
+            background: none;
+        }
+
+        h1, h5, h4 {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .btn-primary {
+            background-color: #007BFF;
+            border-color: #007BFF;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+    </style>
+    <title>ReadySetAI | Technology in Progress</title>
+</head>
+<body>
+<!-- Error Section -->
+<div class="container mt-5" id="error">
+    <div class="jumbotron">
+        <h1> 502 Bad Gateway. The port is not up yet.</h1>
+        <h5>NOTE: This is not necessarily an error</h5>
+        <h4 style="color:#FF6347">Check your container logs for the following:</h4>
+        <ul class="lead">
+            <li>Wait for the container to finish setting up.</li>
+            <li>Ensure that there are no errors.</li>
+            <li>Ensure that the logs say <strong>Container is READY!</strong></li>
+        </ul>
+        <button class="btn btn-primary" onclick="location.reload()">Refresh</button>
+    </div>
+</div>
+<div class="container mt-5">
+    <h1>ReadySetAI - We're Setting Things Up</h1>
+    <p class="lead">
+        ReadySetAI is at the forefront of AI-driven media content manipulation.
+        We're currently working on deploying our innovative tools for you.
+    </p>
+    <h4 style="color:#FF6347">While You Wait:</h4>
+    <ul class="lead">
+        <li>Check out our <a href="https://github.com/ReadySetAI" style="color: #FFD700;" target="_blank">GitHub</a> for
+            the latest updates.
+        </li>
+        <li>Stay updated on our progress by checking back soon!</li>
+    </ul>
+</div>
+</body>
+</html>

@@ -1,78 +1,151 @@
-name: 'Build and Push'
+name: Build and Deploy
 
 on:
   workflow_dispatch:
+    inputs:
+      build-only:
+        default: false
+        description: 'Do not deploy a new image to an instance(build and push only)'
+        required: false
+        type: boolean
   push:
+    paths:
+      - 'docker/**'
+      - 'webui-user.sh'
     branches:
-      - develop
+      - 'main'
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - 'main'
 
-permissions:
-  contents: read
+env:
+  API_IMAGE_NAME: 'deft1991/watchman'
+  DOCKERFILE_NAME: 'Dockerfile'
+  DOCKERFILE_PATH: './docker/'
 
 jobs:
-  build:
+  docker-build-push:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
-      - name: Get next version
-        uses: reecetech/version-increment@2023.4.1
-        id: version
+      - name: Login to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
         with:
-          scheme: semver
-#          The digit to increment, either major, minor or patch, ignored if scheme == calver
-          increment: patch
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build the Docker image
-#        run: docker build -t deft1991/watchman:v.${{ secrets.MAJOR }}.${{ secrets.MINOR }} -t deft1991/watchman:latest -f docker/Dockerfile .
-        run: docker build -t deft1991/watchman:v.${{ steps.version.outputs.version }} -t deft1991/watchman:latest -f docker/Dockerfile .
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          registry: docker.io
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Push to DockerHub
-        run: docker image push --all-tags deft1991/watchman
-
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
-          images: deft1991/watchman
+          images: ${ env.API_IMAGE_NAME }
+          flavor: |
+            latest=auto
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha
+          labels: |
+            maintainer=https://github.com/deft1991
+            org.opencontainers.image.title=RunPodStableDiffusion
+            org.opencontainers.image.description=Watchman bot for telegram channels
+            org.opencontainers.image.url=https://hub.docker.com/r/deft1991/watchman
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
+      - name: Build and push to the registry
+        uses: docker/build-push-action@v5
         with:
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           context: .
-          file: ./docker/Dockerfile
-          load: true
-          tags: ${{ steps.meta.outputs.tags }}
+          file: ${{ env.DOCKERFILE_PATH }}/${{ env.DOCKERFILE_NAME }}
           labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64
+          tags: ${{ steps.meta.outputs.tags }}
+    outputs:
+      tag: ${{ steps.meta.outputs.version }}
 
-  # TODO: After recreating the ec2 instance, we need add a new ssh key for this job and update the secrets
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    needs: docker-build-push
+    if: github.event.inputs.build-only == 'false'
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      # Login to ec2 and deploy the new images
-      - name: Login to ec2 and deploy the new images
-        uses: appleboy/ssh-action@master
+      - name: Generate an actual docker-compose.yaml
+        id: docker-compose-gen
+        env:
+          API_IMAGE_TAG: ${{ needs.docker-build-push.outputs.tag }}
+          SCRIPT_DIR: "scripts"
+          DOCKER_DIR: "docker"
+        run: |
+          echo "Generate an updated docker-compose.yml file with new tag..."
+          ./"$SCRIPT_DIR"/update_docker_image.sh "${API_IMAGE_NAME}:${API_IMAGE_TAG}"
+          
+          DOCKER_COMPOSE_FILE="$(yq -o=json '.' $DOCKER_DIR/compose.yaml)"
+          echo "DOCKER_COMPOSE_FILE="$(echo "$DOCKER_COMPOSE_FILE")"" >> "$GITHUB_OUTPUT"
+          NGINX_CONFIG_FILE=$(cat "$DOCKER_DIR/proxy/nginx.conf" | base64 -w 0)
+          echo "NGINX_CONFIG_FILE="$(echo "$NGINX_CONFIG_FILE")"" >> "$GITHUB_OUTPUT"
+          NGINX_INDEX_FILE=$(cat "$DOCKER_DIR/proxy/index.html" | base64 -w 0)
+          echo "NGINX_INDEX_FILE="$(echo "$NGINX_INDEX_FILE")"" >> "$GITHUB_OUTPUT"
+          NGINX_403_FILE=$(cat "$DOCKER_DIR/proxy/403.html" | base64 -w 0)
+          echo "NGINX_403_FILE="$(echo "$NGINX_403_FILE")"" >> "$GITHUB_OUTPUT"
+          NGINX_502_FILE=$(cat "$DOCKER_DIR/proxy/502.html" | base64 -w 0)
+          echo "NGINX_502_FILE="$(echo "$NGINX_502_FILE")"" >> "$GITHUB_OUTPUT"
+
+      - name: Login to API instance and deploy a new image
+        uses: appleboy/ssh-action@v1.0.0
+        env:
+          DOCKER_COMPOSE_FILE: ${{ steps.docker-compose-gen.outputs.DOCKER_COMPOSE_FILE }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+#          DOCKER_PASSWORD: ${{ secrets.DOCKER_API_TOKEN }}
+#          DOCKER_USERNAME: deft1991
+          ENV_FILE: ${{ secrets.ENV_FILE }}
+          NGINX_403_FILE: ${{ steps.docker-compose-gen.outputs.NGINX_403_FILE }}
+          NGINX_502_FILE: ${{ steps.docker-compose-gen.outputs.NGINX_502_FILE }}
+          NGINX_CONFIG_FILE: ${{ steps.docker-compose-gen.outputs.NGINX_CONFIG_FILE }}
+          NGINX_INDEX_FILE: ${{ steps.docker-compose-gen.outputs.NGINX_INDEX_FILE }}
+          SRC_DIR: "/home/cicd/watchman"
         with:
-          host: '3.133.161.72'
-          username: cicd-user
-          key: ${{ secrets.EC2_KEY }}
+          host: ${{ secrets.API_HOST }}
+          username: ${{ secrets.API_USERNAME }}
+          key: ${{ secrets.API_KEY }}
           port: 22
+          script_stop: true
+          envs: DOCKER_COMPOSE_FILE,ENV_FILE,NGINX_CONFIG_FILE,NGINX_INDEX_FILE,NGINX_403_FILE,NGINX_502_FILE,SRC_DIR,DOCKER_PASSWORD,DOCKER_USERNAME
+          command_timeout: 30m
           script: |
-            cd /home/cicd-user
-            sed -i "s/IMAGE_TAG/${{ steps.meta.outputs.tags }}/g" docker-compose.yml
-            docker rmi $(docker images -q)
-            docker-compose pull
-            docker-compose up -d
+            mkdir -p "${SRC_DIR}/proxy"
+            cd "$SRC_DIR"
+            
+            # Update nginx config
+            echo "$NGINX_CONFIG_FILE" | base64 -d > proxy/nginx.conf
+            echo "$NGINX_INDEX_FILE" | base64 -d > proxy/index.html
+            echo "$NGINX_403_FILE" | base64 -d > proxy/403.html
+            echo "$NGINX_502_FILE" | base64 -d > proxy/502.html
+            
+            # Update creds
+            echo "$ENV_FILE" | base64 -d > .env
+            
+            # Update docker compose file
+            yq -p=json <<<"$DOCKER_COMPOSE_FILE" > compose.yaml
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+            docker compose pull api
+            docker compose up -d
+            docker compose up -d --remove-orphans --force-recreate
