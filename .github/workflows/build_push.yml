@@ -5,7 +5,7 @@ on:
     inputs:
       build-only:
         default: false
-        description: 'Do not deploy a new image to an instance(build and push only)'
+        description: 'Deploy to an instance? By default do not deploy a new image to an instance(build and push only)'
         required: false
         type: boolean
   push:
@@ -108,8 +108,10 @@ jobs:
         uses: appleboy/ssh-action@v1.0.0
         env:
           DOCKER_COMPOSE_FILE: ${{ steps.docker-compose-gen.outputs.DOCKER_COMPOSE_FILE }}
+          DOCKER_USERNAME: deft1991
           DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
-          DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+#          DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+#          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
           ENV_FILE: ${{ secrets.ENV_FILE }}
           NGINX_403_FILE: ${{ steps.docker-compose-gen.outputs.NGINX_403_FILE }}
           NGINX_502_FILE: ${{ steps.docker-compose-gen.outputs.NGINX_502_FILE }}
@@ -118,8 +120,10 @@ jobs:
           SRC_DIR: "/home/cicd/watchman"
         with:
           host: ${{ secrets.API_HOST }}
-          username: ${{ secrets.API_USERNAME }}
+          username: ec2-user
           key: ${{ secrets.API_KEY }}
+#          username: ${{ secrets.API_USERNAME }}
+#          key: ${{ secrets.API_KEY }}
           port: 22
           script_stop: true
           envs: DOCKER_COMPOSE_FILE,ENV_FILE,NGINX_CONFIG_FILE,NGINX_INDEX_FILE,NGINX_403_FILE,NGINX_502_FILE,SRC_DIR,DOCKER_PASSWORD,DOCKER_USERNAME
