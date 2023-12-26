@@ -2,8 +2,8 @@
 FROM gradle:8-jdk21 as build
 WORKDIR /app
 
-COPY /src ./src
-COPY /build.gradle ./build.gradle
+COPY watchman-service/src ./src
+COPY watchman-service/build.gradle ./build.gradle
 COPY /settings.gradle ./settings.gradle
 
 RUN gradle build && \
@@ -27,7 +27,7 @@ FROM debian:stable-slim as final
 WORKDIR /app
 
 COPY --from=runtime /jre /jre
-COPY --from=build /app/build/libs/*.jar app.jar
+COPY --from=build /app/starter/build/libs/*.jar app.jar
 # Setup path to JRE
 ENV PATH="/jre/bin:${PATH}"
 
