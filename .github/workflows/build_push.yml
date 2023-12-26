@@ -9,9 +9,9 @@ on:
         required: false
         type: boolean
   push:
-    paths:
-      - 'docker/**'
-      - 'webui-user.sh'
+#    paths:
+#      - 'docker/**'
+#      - 'webui-user.sh'
     branches:
       - 'develop'
     tags:
