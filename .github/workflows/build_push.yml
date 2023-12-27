@@ -125,8 +125,8 @@ jobs:
           envs: DOCKER_COMPOSE_FILE,ENV_FILE,NGINX_CONFIG_FILE,NGINX_INDEX_FILE,NGINX_403_FILE,NGINX_502_FILE,SRC_DIR,DOCKER_PASSWORD,DOCKER_USERNAME
           command_timeout: 30m
           script: |
-            # mkdir -p "${SRC_DIR}/proxy"
-            # cd "$SRC_DIR"
+            mkdir -p "${SRC_DIR}/proxy"
+            cd "$SRC_DIR"
             
             # Update nginx config
             # echo "$NGINX_CONFIG_FILE" | base64 -d > proxy/nginx.conf
@@ -136,7 +136,7 @@ jobs:
             
             # Update creds
             # echo "$ENV_FILE" | base64 -d > .env
-            echo $(echo "$ENV_FILE" | base64 -d) > .env
+            # echo $(echo "$ENV_FILE" | base64 -d) > .env
             
             # Update docker compose file
             # yq -p=json <<<"$DOCKER_COMPOSE_FILE" > compose.yaml
