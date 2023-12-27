@@ -135,7 +135,7 @@ jobs:
             echo "$NGINX_502_FILE" | base64 -d > proxy/502.html
             
             # Update creds
-            echo "$ENV_FILE" | base64 -d > .env
+            echo $(echo "$ENV_FILE" | base64 -d) > .env
             
             # Update docker compose file
             yq -p=json <<<"$DOCKER_COMPOSE_FILE" > compose.yaml
