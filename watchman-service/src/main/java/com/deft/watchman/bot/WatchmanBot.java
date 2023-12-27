@@ -62,6 +62,9 @@ public class WatchmanBot extends AbilityBot {
      */
     @Override
     public void onUpdateReceived(Update update) {
+        if (!update.hasMessage() && !update.hasEditedMessage()){
+            return;
+        }
         if (update.hasEditedMessage()) {
             Message message = update.getEditedMessage();
             Chat chat = message.getChat();
@@ -72,7 +75,7 @@ public class WatchmanBot extends AbilityBot {
                 if (isNewUser(userId, chatId)) {
                     if (isUserSentMessageWithTag(message) && isNeedLinkedIn && isUserSentMessageWithLinkedInLink(message)) {
                         chatProcessorsMap.get(ProcessorType.VALIDATE_EDIT_FIRST_MESSAGE).processUpdate(this, update);
-                        chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
+                        chatProcessorsMap.get(ProcessorType.DELETE_ADD_LINKEDIN_MESSAGE).processUpdate(this, update);
                     } else {
                         chatProcessorsMap.get(ProcessorType.BAN_CHAT_MEMBER).processUpdate(this, update);
                         chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
@@ -80,8 +83,6 @@ public class WatchmanBot extends AbilityBot {
                     }
                 }
             }
-        } else if (!update.hasMessage()) {
-            return;
         } else if (update.getMessage().isCommand()) {
             Message message = update.getMessage();
             String text = message.getText() + " ";

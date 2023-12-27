@@ -7,6 +7,7 @@ package com.deft.watchman.processor;
 public enum ProcessorType {
     DELETE_MESSAGE,
     DELETE_WELCOME_MESSAGE,
+    DELETE_ADD_LINKEDIN_MESSAGE,
     JOIN_GROUP,
     VALIDATE_FIRST_MESSAGE,
     VALIDATE_EDIT_FIRST_MESSAGE,
