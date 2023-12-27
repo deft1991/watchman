@@ -8,9 +8,6 @@ on:
         description: 'Deploy to an instance? By default do not deploy a new image to an instance(build and push only)'
         required: false
         type: boolean
-  push:
-    branches:
-      - 'develop'
     tags:
       - 'v*'
   pull_request:
