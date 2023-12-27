@@ -14,24 +14,28 @@ services:
     expose:
       - "5432:5432"
     restart: unless-stopped
-  
+
   api:
     container_name: api
     image: ${API_IMAGE}
     build:
-      context: ../
+      context: ../../../
       dockerfile: docker/Dockerfile
     env_file:
       - .env
     environment:
       JAVA_OPTS: "-Xmx512m -Xms256m"
-      SPRING_PROFILES_ACTIVE: ${ENV:-dev}
+      SPRING_PROFILES_ACTIVE: ${ENV:-local}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
     expose:
       - "8080:8080"
     restart: unless-stopped
-    depends_on:
-      - postgres
-  
+
   nginx:
     container_name: nginx
     image: nginx:mainline-alpine-slim
