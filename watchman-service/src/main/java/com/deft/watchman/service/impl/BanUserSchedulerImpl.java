@@ -16,6 +16,7 @@ import org.telegram.telegrambots.meta.api.methods.groupadministration.BanChatMem
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Set;
 
 /**
@@ -36,32 +37,36 @@ public class BanUserSchedulerImpl implements BanUserScheduler {
     @Value("${telegram.bot.ban-seconds:120}")
     private int banSeconds;
 
+    @Value("${scheduler.ban.wait-time-seconds:300}")
+    private int waitTime;
+
     @Override
     @Async
-    @Scheduled(fixedDelay = 1000 * 60 * 10)
+    @Scheduled(fixedDelayString = "${scheduler.ban.fixed-rate.in.milliseconds:600_000}")
     public void banUser() {
-        Set<ChatUser> allByNewUserTrue = chatUserRepository.findAllByNewUserTrueAndLeaveFalse(); // todo select with timestamp
+        Instant kickTime = Instant.now().minus(waitTime, ChronoUnit.SECONDS);
+        Set<ChatUser> allByNewUserTrue = chatUserRepository
+                .findAllByNewUserTrueAndLeaveFalseAndJoinGroupTimeIsBefore(kickTime);
         for (ChatUser chatUser : allByNewUserTrue) {
-            if (chatUser.getJoinGroupTime() != null && chatUser.getJoinGroupTime().isBefore(Instant.now())) {
+            chatUser.setLeave(true);
 
-                chatUser.setLeave(true);
+            BanChatMember kickChatMember = BanChatMember
+                    .builder()
+                    .chatId(chatUser.getChatId())
+                    .userId(chatUser.getUserId())
+                    .untilDate((int) (System.currentTimeMillis() / 1000) + banSeconds)
+                    .build();
 
-                BanChatMember kickChatMember = BanChatMember.builder()
+            // todo maybe save banned users in DB
+            if (chatUser.getWelcomeMessageId() != null) {
+                DeleteMessage deleteMessage = DeleteMessage
+                        .builder()
                         .chatId(chatUser.getChatId())
-                        .userId(chatUser.getUserId())
-                        .untilDate((int) (System.currentTimeMillis() / 1000) + banSeconds)
+                        .messageId(chatUser.getWelcomeMessageId())
                         .build();
-
-                // todo save banned users in DB
-                if (chatUser.getWelcomeMessageId() != null) {
-                    DeleteMessage deleteMessage = DeleteMessage.builder()
-                            .chatId(chatUser.getChatId())
-                            .messageId(chatUser.getWelcomeMessageId())
-                            .build();
-                    watchmanBot.silent().execute(deleteMessage);
-                }
-                watchmanBot.silent().execute(kickChatMember);
+                watchmanBot.silent().execute(deleteMessage);
             }
+            watchmanBot.silent().execute(kickChatMember);
         }
     }
 }

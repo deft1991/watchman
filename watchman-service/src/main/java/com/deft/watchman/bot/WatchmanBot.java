@@ -62,7 +62,7 @@ public class WatchmanBot extends AbilityBot {
      */
     @Override
     public void onUpdateReceived(Update update) {
-        if (!update.hasMessage() && !update.hasEditedMessage()){
+        if (!update.hasMessage() && !update.hasEditedMessage()) {
             return;
         }
         if (update.hasEditedMessage()) {
@@ -77,26 +77,16 @@ public class WatchmanBot extends AbilityBot {
                         chatProcessorsMap.get(ProcessorType.VALIDATE_EDIT_FIRST_MESSAGE).processUpdate(this, update);
                         chatProcessorsMap.get(ProcessorType.DELETE_ADD_LINKEDIN_MESSAGE).processUpdate(this, update);
                     } else {
-                        chatProcessorsMap.get(ProcessorType.BAN_CHAT_MEMBER).processUpdate(this, update);
-                        chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
-                        chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
+                        banUserAndDeleteMessages(update, ProcessorType.BAN_CHAT_MEMBER, ProcessorType.DELETE_MESSAGE, ProcessorType.DELETE_WELCOME_MESSAGE);
                     }
                 }
             }
         } else if (update.getMessage().isCommand()) {
-            Message message = update.getMessage();
-            String text = message.getText() + " ";
-            String command = text.substring(1, text.indexOf(" ")).toUpperCase();
-            if (EnumUtils.isValidEnum(CommandType.class, command)) {
-                commandProcessorMap.get(CommandType.valueOf(command.toUpperCase())).processCommand(this, update);
-            }
+            processCommand(update);
         } else if (isLeftChat(update)) {
-            chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
-            chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
-            chatProcessorsMap.get(ProcessorType.LEAVE_GROUP).processUpdate(this, update);
+            banUserAndDeleteMessages(update, ProcessorType.DELETE_MESSAGE, ProcessorType.DELETE_WELCOME_MESSAGE, ProcessorType.LEAVE_GROUP);
         } else if (isJoinGroup(update)) {
-            chatProcessorsMap.get(ProcessorType.JOIN_GROUP).processUpdate(this, update);
-            chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
+            processJoinGroup(update);
         } else if (update.getMessage().hasText()) {
             Message message = update.getMessage();
             Chat chat = message.getChat();
@@ -123,33 +113,61 @@ public class WatchmanBot extends AbilityBot {
                             chatProcessorsMap.get(ProcessorType.ADD_LINKEDIN).processUpdate(this, update);
                         }
                     } else {
-                        chatProcessorsMap.get(ProcessorType.BAN_CHAT_MEMBER).processUpdate(this, update);
-                        chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
-                        chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
+                        banUserAndDeleteMessages(update, ProcessorType.BAN_CHAT_MEMBER, ProcessorType.DELETE_MESSAGE, ProcessorType.DELETE_WELCOME_MESSAGE);
                     }
                 } else {
-                    Optional<ChatUser> optionalChatUser = chatUserService.findByUserIdAndChatId(userId, chatId);
-                    if (optionalChatUser.isEmpty()) {
-                        chatUserService.createOldUser(fromUser, chatId);
-                    }
-                    chatUserService.increaseMessageCount(userId, chatId);
-                    if (message.isReply()) {
-                        Message replyToMessage = message.getReplyToMessage();
-                        User replyToUser = replyToMessage.getFrom();
-                        Chat chat1 = replyToMessage.getChat();
-
-                        Long replyToUserId = replyToUser.getId();
-                        Optional<ChatUser> optionalReplyToUser = chatUserService.findByUserIdAndChatId(replyToUserId, chat1.getId());
-                        if (optionalReplyToUser.isEmpty()) {
-                            chatUserService.createOldUser(replyToUser, chat1.getId());
-                        }
-                        chatUserService.increaseReplyToCount(userId, chatId);
-
-                        chatUserService.increaseReplyFromCount(replyToUserId, chat1.getId());
-                    }
+                    processStatistics(userId, chatId, fromUser, message);
                 }
             }
         }
+    }
+
+    /**
+     * Check message and change statistic
+     */
+    private void processStatistics(Long userId, Long chatId, User fromUser, Message message) {
+        Optional<ChatUser> optionalChatUser = chatUserService.findByUserIdAndChatId(userId, chatId);
+        if (optionalChatUser.isEmpty()) {
+            chatUserService.createOldUser(fromUser, chatId);
+        }
+        chatUserService.increaseMessageCount(userId, chatId);
+        if (message.isReply()) {
+            Message replyToMessage = message.getReplyToMessage();
+            User replyToUser = replyToMessage.getFrom();
+            Chat chat = replyToMessage.getChat();
+
+            Long replyToUserId = replyToUser.getId();
+            Optional<ChatUser> optionalReplyToUser = chatUserService.findByUserIdAndChatId(replyToUserId, chat.getId());
+            if (optionalReplyToUser.isEmpty()) {
+                chatUserService.createOldUser(replyToUser, chat.getId());
+            }
+            chatUserService.increaseReplyToCount(userId, chatId);
+
+            chatUserService.increaseReplyFromCount(replyToUserId, chat.getId());
+        }
+    }
+
+    private void processJoinGroup(Update update) {
+        if (update.getMessage().getFrom().getIsBot()) {
+            return;
+        }
+        chatProcessorsMap.get(ProcessorType.JOIN_GROUP).processUpdate(this, update);
+        chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
+    }
+
+    private void processCommand(Update update) {
+        Message message = update.getMessage();
+        String text = message.getText() + " ";
+        String command = text.substring(1, text.indexOf(" ")).toUpperCase();
+        if (EnumUtils.isValidEnum(CommandType.class, command)) {
+            commandProcessorMap.get(CommandType.valueOf(command.toUpperCase())).processCommand(this, update);
+        }
+    }
+
+    private void banUserAndDeleteMessages(Update update, ProcessorType banChatMember, ProcessorType deleteMessage, ProcessorType deleteWelcomeMessage) {
+        chatProcessorsMap.get(banChatMember).processUpdate(this, update);
+        chatProcessorsMap.get(deleteMessage).processUpdate(this, update);
+        chatProcessorsMap.get(deleteWelcomeMessage).processUpdate(this, update);
     }
 
     private boolean isNewUser(Long userId, Long chatId) {

@@ -67,3 +67,9 @@ telegram:
     ban-seconds: 60
     linkedin:
       enable: true
+scheduler:
+  ban:
+    fixed-rate:
+      in:
+        milliseconds: 600_000
+    wait-time-seconds: 120

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 
@@ -25,7 +26,7 @@ public interface ChatUserRepository extends CrudRepository<ChatUser, Long> {
     @QueryHints(@QueryHint(name = HibernateHints.HINT_CACHEABLE, value = "true"))
     Optional<ChatUser> findByUserNameAndChatId(String username, Long chatId);
 
-    Set<ChatUser> findAllByNewUserTrueAndLeaveFalse();
+    Set<ChatUser> findAllByNewUserTrueAndLeaveFalseAndJoinGroupTimeIsBefore(Instant time);
 
     Set<ChatUser> findTop5ByOrderByMessageCountDesc();
 

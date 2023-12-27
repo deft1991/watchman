@@ -57,29 +57,29 @@ public class AddLinkedInProcessor implements ChatUpdateProcessor {
 
         // Check if the new member joined the group
         if (chat.isGroupChat() || chat.isSuperGroupChat()) {
-                Optional<ChatUser> optionalChatUser = chatUserService.findByUserIdAndChatId(user.getId(), chat.getId());
-                ChatUser chatUser;
-                if (optionalChatUser.isEmpty()) {
-                    chatUser = chatUserMapper.mapToEntity(user);
-                    chatUser.setChatId(chat.getId());
-                    chatUser = chatUserService.save(chatUser);
-                } else {
-                    chatUser = optionalChatUser.get();
-                }
-                chatUser.setNewUser(true);
-                chatUser.setLeave(false);
-                chatUser.setJoinGroupTime(Instant.now());
+            Optional<ChatUser> optionalChatUser = chatUserService.findByUserIdAndChatId(user.getId(), chat.getId());
+            ChatUser chatUser;
+            if (optionalChatUser.isEmpty()) {
+                chatUser = chatUserMapper.mapToEntity(user);
+                chatUser.setChatId(chat.getId());
+                chatUser = chatUserService.save(chatUser);
+            } else {
+                chatUser = optionalChatUser.get();
+            }
+            chatUser.setNewUser(true);
+            chatUser.setLeave(false);
+            chatUser.setJoinGroupTime(Instant.now());
 
-                String formatted = String.format(messageDictionary.getMessage(), user.getFirstName());
-                // Send an invite message
-                if (chatUser.isNewUser()) {
-                    SendMessage sendMessage = SendMessage.builder()
-                            .chatId(chat.getId().toString())
-                            .text(formatted)
-                            .build();
-                    Optional<Message> execute = bot.silent().execute(sendMessage);
-                    if (execute.isPresent()) {
-                        chatUser.setWelcomeMessageId(execute.get().getMessageId());
+            String formatted = String.format(messageDictionary.getMessage(), user.getFirstName());
+            // Send an invite message
+            if (chatUser.isNewUser()) {
+                SendMessage sendMessage = SendMessage.builder()
+                        .chatId(chat.getId().toString())
+                        .text(formatted)
+                        .build();
+                Optional<Message> execute = bot.silent().execute(sendMessage);
+                if (execute.isPresent()) {
+                    chatUser.setWelcomeMessageId(execute.get().getMessageId());
                 }
             }
         }
