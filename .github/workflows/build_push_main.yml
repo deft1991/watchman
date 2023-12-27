@@ -145,5 +145,5 @@ jobs:
             # yq -p=json <<<"$DOCKER_COMPOSE_FILE" > compose.yaml
             # echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-            docker compose pull api
-            docker compose up -d --remove-orphans --force-recreate
+            docker-compose pull api
+            docker-compose up -d --remove-orphans --force-recreate
