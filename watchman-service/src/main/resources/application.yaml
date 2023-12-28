@@ -67,7 +67,10 @@ telegram:
     ban-seconds: 60
     linkedin:
       enable: true
-      pattern: https://(www\.)?linkedin\.com/in/
+      pattern: (https?://)?(www\.)?linkedin\.com/in/\w+/?
+    whois:
+      enable: true
+      pattern: \s#whois\s|\s#whois$|^#whois\s|^#whois$
 scheduler:
   ban:
     fixed-rate:

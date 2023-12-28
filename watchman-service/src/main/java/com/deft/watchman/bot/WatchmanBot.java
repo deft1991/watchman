@@ -7,9 +7,10 @@ import com.deft.watchman.processor.ProcessorType;
 import com.deft.watchman.processor.commands.CommandProcessor;
 import com.deft.watchman.processor.commands.CommandType;
 import com.deft.watchman.service.ChatUserService;
+import com.deft.watchman.service.LinkedInLinkParserService;
+import com.deft.watchman.service.WhoisParserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.telegram.abilitybots.api.bot.AbilityBot;
@@ -21,8 +22,6 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -37,16 +36,15 @@ public class WatchmanBot extends AbilityBot {
     private final Map<ProcessorType, ChatUpdateProcessor> chatProcessorsMap;
     private final Map<CommandType, CommandProcessor> commandProcessorMap;
     private final ChatUserService chatUserService;
-
-    @Value("${telegram.bot.linkedin.enable:true}")
-    private boolean isNeedLinkedIn;
-    @Value("${telegram.bot.linkedin.pattern:https://(www\\.)?linkedin\\.com/in/}")
-    private String linkedinPattern;
+    private final LinkedInLinkParserService linkedInLinkParserService;
+    private final WhoisParserService whoisParserService;
 
 
     public WatchmanBot(Environment environment,
                        List<ChatUpdateProcessor> processors,
                        ChatUserService chatUserService,
+                       LinkedInLinkParserService linkedInLinkParserService,
+                       WhoisParserService whoisParserService,
                        List<CommandProcessor> commandProcessors) {
         super(environment.getProperty("telegram.bot.token"), environment.getProperty("telegram.bot.userName"));
         chatProcessorsMap = processors.stream()
@@ -54,6 +52,8 @@ public class WatchmanBot extends AbilityBot {
         this.chatUserService = chatUserService;
         commandProcessorMap = commandProcessors.stream()
                 .collect(Collectors.toMap(CommandProcessor::getProcessorType, p -> p));
+        this.linkedInLinkParserService = linkedInLinkParserService;
+        this.whoisParserService = whoisParserService;
     }
 
     @Override
@@ -77,7 +77,9 @@ public class WatchmanBot extends AbilityBot {
             Long chatId = chat.getId();
             if (chat.isGroupChat() || chat.isSuperGroupChat()) {
                 if (isNewUser(userId, chatId)) {
-                    if (isUserSentMessageWithTag(message) && isNeedLinkedIn && isUserSentMessageWithLinkedInLink(message)) {
+                    if (whoisParserService.containsValidTag(message.getText())
+                            && linkedInLinkParserService.isEnabled()
+                            && linkedInLinkParserService.containsValidLinkedInProfileLink(message.getText())) {
                         chatProcessorsMap.get(ProcessorType.VALIDATE_EDIT_FIRST_MESSAGE).processUpdate(this, update);
                         chatProcessorsMap.get(ProcessorType.DELETE_ADD_LINKEDIN_MESSAGE).processUpdate(this, update);
                     } else {
@@ -108,11 +110,11 @@ public class WatchmanBot extends AbilityBot {
                  todo - I need to do it more flexible. I don't like a lot of if cases
                  */
                 if (isNewUser(userId, chatId)) {
-                    if (isUserSentMessageWithTag(message)) {
-                        if (!isNeedLinkedIn || isUserSentMessageWithLinkedInLink(message)) {
+                    if (whoisParserService.containsValidTag(message.getText())) {
+                        if (!linkedInLinkParserService.isEnabled() || linkedInLinkParserService.containsValidLinkedInProfileLink(message.getText())) {
                             chatProcessorsMap.get(ProcessorType.VALIDATE_FIRST_MESSAGE).processUpdate(this, update);
                             chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
-                        } else if (isNeedLinkedIn) {
+                        } else if (linkedInLinkParserService.isEnabled()) {
                             chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
                             chatProcessorsMap.get(ProcessorType.ADD_LINKEDIN).processUpdate(this, update);
                         }
@@ -178,25 +180,6 @@ public class WatchmanBot extends AbilityBot {
         // todo save users here. we need it to support new users
         Optional<ChatUser> optionalChatUser = chatUserService.findByUserIdAndChatId(userId, chatId);
         return optionalChatUser.map(ChatUser::isNewUser).orElse(false);
-    }
-
-    private boolean isUserSentMessageWithTag(Message message) {
-        // todo move to db constant
-        return message.getText().toLowerCase().contains("#whois");
-    }
-
-    private boolean isUserSentMessageWithLinkedInLink(Message message) {
-        // Define the regular expression pattern
-        String regex = linkedinPattern;
-
-        // Create a Pattern object
-        Pattern pattern = Pattern.compile(regex);
-
-        // Create a Matcher object
-        Matcher matcher = pattern.matcher(message.getText());
-
-        // Check if the pattern is found in the message
-        return matcher.find();
     }
 
     private static boolean isJoinGroup(Update update) {

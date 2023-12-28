@@ -7,4 +7,7 @@ package com.deft.watchman.service;
 public interface LinkedInLinkParserService {
 
     String extractLinkedInProfileLink(String input);
+    boolean containsValidLinkedInProfileLink(String input);
+
+    boolean isEnabled();
 }

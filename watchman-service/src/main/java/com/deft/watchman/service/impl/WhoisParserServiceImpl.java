@@ -1,6 +1,6 @@
 package com.deft.watchman.service.impl;
 
-import com.deft.watchman.service.LinkedInLinkParserService;
+import com.deft.watchman.service.WhoisParserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -10,24 +10,27 @@ import org.springframework.stereotype.Service;
  */
 
 @Service
-public class LinkedInLinkParserServiceImpl implements LinkedInLinkParserService {
+public class WhoisParserServiceImpl implements WhoisParserService {
 
-    @Value("${telegram.bot.linkedin.enable:true}")
+    @Value("${telegram.bot.whois.enable:true}")
     private boolean isEnable;
 
-    @Value("${telegram.bot.linkedin.pattern}")
+    @Value("${telegram.bot.whois.pattern}")
     private String textPattern;
 
     @Override
-    public String extractLinkedInProfileLink(String input) {
-       return ParserServiceHelper.extractTextByPattern(input, textPattern);
+    public String extractTag(String input) {
+        return ParserServiceHelper.extractTextByPattern(input, textPattern);
     }
 
     @Override
-    public boolean containsValidLinkedInProfileLink(String input) {
+    public boolean containsValidTag(String input) {
         return ParserServiceHelper.isValidInput(input, textPattern);
     }
 
+    /**
+     * Todo add code for it later
+     */
     @Override
     public boolean isEnabled() {
         return isEnable;
