@@ -67,6 +67,7 @@ telegram:
     ban-seconds: 60
     linkedin:
       enable: true
+      pattern: https://(www\.)?linkedin\.com/in/
 scheduler:
   ban:
     fixed-rate:

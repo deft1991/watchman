@@ -21,6 +21,8 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +40,8 @@ public class WatchmanBot extends AbilityBot {
 
     @Value("${telegram.bot.linkedin.enable:true}")
     private boolean isNeedLinkedIn;
+    @Value("${telegram.bot.linkedin.pattern:https://(www\\.)?linkedin\\.com/in/}")
+    private String linkedinPattern;
 
 
     public WatchmanBot(Environment environment,
@@ -182,8 +186,17 @@ public class WatchmanBot extends AbilityBot {
     }
 
     private boolean isUserSentMessageWithLinkedInLink(Message message) {
-        // todo move to db constant
-        return message.getText().toLowerCase().contains("https://www.linkedin.com/in/");
+        // Define the regular expression pattern
+        String regex = linkedinPattern;
+
+        // Create a Pattern object
+        Pattern pattern = Pattern.compile(regex);
+
+        // Create a Matcher object
+        Matcher matcher = pattern.matcher(message.getText());
+
+        // Check if the pattern is found in the message
+        return matcher.find();
     }
 
     private static boolean isJoinGroup(Update update) {
