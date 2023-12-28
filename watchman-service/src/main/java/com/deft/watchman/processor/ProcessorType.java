@@ -14,4 +14,5 @@ public enum ProcessorType {
     BAN_CHAT_MEMBER,
     LEAVE_GROUP,
     ADD_LINKEDIN,
+    DONT_USE_TAG,
 }

@@ -111,7 +111,10 @@ public class WatchmanBot extends AbilityBot {
                  */
                 if (isNewUser(userId, chatId)) {
                     if (whoisParserService.containsValidTag(message.getText())) {
-                        if (!linkedInLinkParserService.isEnabled() || linkedInLinkParserService.containsValidLinkedInProfileLink(message.getText())) {
+                        if (!isEmptyInviteMessage(userId, chatId)){
+                            chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
+                            chatProcessorsMap.get(ProcessorType.DONT_USE_TAG).processUpdate(this, update);
+                        } else if (!linkedInLinkParserService.isEnabled() || linkedInLinkParserService.containsValidLinkedInProfileLink(message.getText())) {
                             chatProcessorsMap.get(ProcessorType.VALIDATE_FIRST_MESSAGE).processUpdate(this, update);
                             chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
                         } else if (linkedInLinkParserService.isEnabled()) {
@@ -122,6 +125,14 @@ public class WatchmanBot extends AbilityBot {
                         banUserAndDeleteMessages(update, ProcessorType.BAN_CHAT_MEMBER, ProcessorType.DELETE_MESSAGE, ProcessorType.DELETE_WELCOME_MESSAGE);
                     }
                 } else {
+                    /*
+                    For old users ->
+                    if user send message with #whois tag we should remove it and show message like dont do it
+                     */
+                    if (whoisParserService.containsValidTag(message.getText())) {
+                        chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
+                        chatProcessorsMap.get(ProcessorType.DONT_USE_TAG).processUpdate(this, update);
+                    }
                     processStatistics(userId, chatId, fromUser, message);
                 }
             }
@@ -180,6 +191,12 @@ public class WatchmanBot extends AbilityBot {
         // todo save users here. we need it to support new users
         Optional<ChatUser> optionalChatUser = chatUserService.findByUserIdAndChatId(userId, chatId);
         return optionalChatUser.map(ChatUser::isNewUser).orElse(false);
+    }
+
+    private boolean isEmptyInviteMessage(Long userId, Long chatId) {
+        // todo save users here. we need it to support new users
+        Optional<ChatUser> optionalChatUser = chatUserService.findByUserIdAndChatId(userId, chatId);
+        return optionalChatUser.map(u -> u.getInviteMessage() == null).orElse(false);
     }
 
     private static boolean isJoinGroup(Update update) {

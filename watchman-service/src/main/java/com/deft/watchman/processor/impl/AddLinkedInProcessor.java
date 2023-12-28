@@ -66,6 +66,7 @@ public class AddLinkedInProcessor implements ChatUpdateProcessor {
             } else {
                 chatUser = optionalChatUser.get();
             }
+            chatUser.setInviteMessage(message.getText());
             chatUser.setNewUser(true);
             chatUser.setLeave(false);
             chatUser.setJoinGroupTime(Instant.now());
