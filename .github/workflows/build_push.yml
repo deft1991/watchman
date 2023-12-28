@@ -136,6 +136,7 @@ jobs:
             
             # Update creds
             # echo $(echo "$ENV_FILE" | base64 -d) > .env
+            echo "$ENV_FILE"
             echo "$ENV_FILE"  > .env
             
             # Update docker compose file
