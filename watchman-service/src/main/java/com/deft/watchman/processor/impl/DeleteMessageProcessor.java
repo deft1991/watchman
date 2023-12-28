@@ -29,12 +29,22 @@ public class DeleteMessageProcessor implements ChatUpdateProcessor {
     @Override
     public void processUpdate(AbilityBot bot, Update update) {
         Message message = update.getMessage();
-
-        DeleteMessage deleteMessage = DeleteMessage.builder()
+        Message editedMessage = update.getEditedMessage();
+        DeleteMessage deleteMessage = null;
+        if (message != null) {
+            deleteMessage = DeleteMessage.builder()
                 .chatId(message.getChatId())
                 .messageId(message.getMessageId())
                 .build();
-        bot.silent().execute(deleteMessage);
+        } else if (editedMessage != null) {
+            deleteMessage = DeleteMessage.builder()
+                    .chatId(editedMessage.getChatId())
+                    .messageId(editedMessage.getMessageId())
+                    .build();
+        }
+        if (deleteMessage != null){
+            bot.silent().execute(deleteMessage);
+        }
     }
 
     @Override
