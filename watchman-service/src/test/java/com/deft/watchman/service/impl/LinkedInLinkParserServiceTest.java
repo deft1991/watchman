@@ -16,7 +16,7 @@ public class LinkedInLinkParserServiceTest {
     @MethodSource("linkedInURLData")
     void checkIsValidLinkedInURL(String input, Boolean expected) {
         LinkedInLinkParserService service = new LinkedInLinkParserServiceImpl();
-        ReflectionTestUtils.setField(service, "linkedinPattern", "(https?://)?(www\\.)?linkedin\\.com/in/\\w+/?");
+        ReflectionTestUtils.setField(service, "textPattern", "(https?://)?(www\\.)?linkedin\\.com/in/\\w+/?");
         boolean actual = service.containsValidLinkedInProfileLink(input);
         assertEquals(expected, actual);
     }
