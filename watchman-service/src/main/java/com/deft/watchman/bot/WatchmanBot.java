@@ -19,6 +19,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -80,17 +81,25 @@ public class WatchmanBot extends AbilityBot {
                     if (whoisParserService.containsValidTag(message.getText())
                             && linkedInLinkParserService.isEnabled()
                             && linkedInLinkParserService.containsValidLinkedInProfileLink(message.getText())) {
-                        chatProcessorsMap.get(ProcessorType.VALIDATE_EDIT_FIRST_MESSAGE).processUpdate(this, update);
-                        chatProcessorsMap.get(ProcessorType.DELETE_ADD_LINKEDIN_MESSAGE).processUpdate(this, update);
+                        executeProcessors(update,
+                                ProcessorType.VALIDATE_EDIT_FIRST_MESSAGE,
+                                ProcessorType.DELETE_ADD_LINKEDIN_MESSAGE);
                     } else {
-                        banUserAndDeleteMessages(update, ProcessorType.BAN_CHAT_MEMBER, ProcessorType.DELETE_MESSAGE, ProcessorType.DELETE_WELCOME_MESSAGE);
+                        executeProcessors(update,
+                                ProcessorType.BAN_CHAT_MEMBER,
+                                ProcessorType.DELETE_MESSAGE,
+                                ProcessorType.DELETE_WELCOME_MESSAGE);
                     }
                 }
             }
         } else if (update.getMessage().isCommand()) {
             processCommand(update);
         } else if (isLeftChat(update)) {
-            banUserAndDeleteMessages(update, ProcessorType.DELETE_MESSAGE, ProcessorType.DELETE_WELCOME_MESSAGE, ProcessorType.LEAVE_GROUP);
+            executeProcessors(update,
+                    ProcessorType.DELETE_MESSAGE,
+                    ProcessorType.DELETE_WELCOME_MESSAGE,
+                    ProcessorType.LEAVE_GROUP,
+                    ProcessorType.DELETE_INVITE_MESSAGE);
         } else if (isJoinGroup(update)) {
             processJoinGroup(update);
         } else if (update.getMessage().hasText()) {
@@ -115,20 +124,26 @@ public class WatchmanBot extends AbilityBot {
                         If user already sent invite message
                          */
                         if (!isEmptyInviteMessage(userId, chatId)){
-                            chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
-                            chatProcessorsMap.get(ProcessorType.DONT_USE_TAG).processUpdate(this, update);
+                            executeProcessors(update,
+                                    ProcessorType.DELETE_MESSAGE,
+                                    ProcessorType.DONT_USE_TAG);
                         /*
                         If linkedIn enabled or user sent valid linkedIn URL
                          */
                         } else if (!linkedInLinkParserService.isEnabled() || linkedInLinkParserService.containsValidLinkedInProfileLink(message.getText())) {
-                            chatProcessorsMap.get(ProcessorType.VALIDATE_FIRST_MESSAGE).processUpdate(this, update);
-                            chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
+                            executeProcessors(update,
+                                    ProcessorType.VALIDATE_FIRST_MESSAGE,
+                                    ProcessorType.DELETE_WELCOME_MESSAGE);
                         } else if (linkedInLinkParserService.isEnabled()) {
-                            chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
-                            chatProcessorsMap.get(ProcessorType.ADD_LINKEDIN).processUpdate(this, update);
+                            executeProcessors(update,
+                                    ProcessorType.DELETE_WELCOME_MESSAGE,
+                                    ProcessorType.ADD_LINKEDIN);
                         }
                     } else {
-                        banUserAndDeleteMessages(update, ProcessorType.BAN_CHAT_MEMBER, ProcessorType.DELETE_MESSAGE, ProcessorType.DELETE_WELCOME_MESSAGE);
+                        executeProcessors(update,
+                                ProcessorType.BAN_CHAT_MEMBER,
+                                ProcessorType.DELETE_MESSAGE,
+                                ProcessorType.DELETE_WELCOME_MESSAGE);
                     }
                 } else {
                     /*
@@ -136,8 +151,9 @@ public class WatchmanBot extends AbilityBot {
                     if user send message with #whois tag we should remove it and show message like dont do it
                      */
                     if (whoisParserService.containsValidTag(message.getText())) {
-                        chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
-                        chatProcessorsMap.get(ProcessorType.DONT_USE_TAG).processUpdate(this, update);
+                        executeProcessors(update,
+                                ProcessorType.DELETE_MESSAGE,
+                                ProcessorType.DONT_USE_TAG);
                     }
                     processStatistics(userId, chatId, fromUser, message);
                 }
@@ -187,10 +203,8 @@ public class WatchmanBot extends AbilityBot {
         }
     }
 
-    private void banUserAndDeleteMessages(Update update, ProcessorType banChatMember, ProcessorType deleteMessage, ProcessorType deleteWelcomeMessage) {
-        chatProcessorsMap.get(banChatMember).processUpdate(this, update);
-        chatProcessorsMap.get(deleteMessage).processUpdate(this, update);
-        chatProcessorsMap.get(deleteWelcomeMessage).processUpdate(this, update);
+    private void executeProcessors(Update update, ProcessorType... processorTypes) {
+        Arrays.stream(processorTypes).forEach(type -> chatProcessorsMap.get(type).processUpdate(this, update));
     }
 
     private boolean isNewUser(Long userId, Long chatId) {

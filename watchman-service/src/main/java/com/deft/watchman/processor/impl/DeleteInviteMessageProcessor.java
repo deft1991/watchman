@@ -7,8 +7,8 @@ import com.deft.watchman.service.ChatUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.telegram.abilitybots.api.bot.AbilityBot;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -23,13 +23,15 @@ import java.util.Optional;
 
 @Slf4j
 @Component
+@Transactional
 @RequiredArgsConstructor
-public class DeleteWelcomeMessageProcessor implements ChatUpdateProcessor {
+public class DeleteInviteMessageProcessor implements ChatUpdateProcessor {
 
     private final ChatUserService chatUserService;
 
     /**
-     * Delete the Telegram's default message about user leaving
+     * Delete invite message
+     * todo maybe add invite message id
      */
     @Override
     public void processUpdate(AbilityBot bot, Update update) {
@@ -42,20 +44,12 @@ public class DeleteWelcomeMessageProcessor implements ChatUpdateProcessor {
         Optional<ChatUser> optionalChatUser = chatUserService.findByUserIdAndChatId(userId, chatId);
         if (optionalChatUser.isPresent()) {
             ChatUser chatUser = optionalChatUser.get();
-            if (chatUser.getWelcomeMessageId() != null) {
-                DeleteMessage deleteWelcomeMessage = DeleteMessage.builder()
-                        .chatId(message.getChatId())
-                        .messageId(chatUser.getWelcomeMessageId())
-                        .build();
-                bot.silent().execute(deleteWelcomeMessage);
-
-                chatUser.setWelcomeMessageId(null);
-            }
+            chatUser.setInviteMessage(null);
         }
     }
 
     @Override
     public ProcessorType getProcessorType() {
-        return ProcessorType.DELETE_WELCOME_MESSAGE;
+        return ProcessorType.DELETE_INVITE_MESSAGE;
     }
 }

@@ -15,4 +15,5 @@ public enum ProcessorType {
     LEAVE_GROUP,
     ADD_LINKEDIN,
     DONT_USE_TAG,
+    DELETE_INVITE_MESSAGE,
 }
