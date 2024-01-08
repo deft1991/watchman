@@ -43,6 +43,8 @@ public class DeleteWelcomeMessageProcessor implements ChatUpdateProcessor {
         if (optionalChatUser.isPresent()) {
             ChatUser chatUser = optionalChatUser.get();
             if (chatUser.getWelcomeMessageId() != null) {
+                chatUser.setWelcomeMessageId(null);
+
                 DeleteMessage deleteWelcomeMessage = DeleteMessage.builder()
                         .chatId(message.getChatId())
                         .messageId(chatUser.getWelcomeMessageId())

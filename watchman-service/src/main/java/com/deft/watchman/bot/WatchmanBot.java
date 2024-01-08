@@ -111,9 +111,15 @@ public class WatchmanBot extends AbilityBot {
                  */
                 if (isNewUser(userId, chatId)) {
                     if (whoisParserService.containsValidTag(message.getText())) {
+                        /*
+                        If user already sent invite message
+                         */
                         if (!isEmptyInviteMessage(userId, chatId)){
                             chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
                             chatProcessorsMap.get(ProcessorType.DONT_USE_TAG).processUpdate(this, update);
+                        /*
+                        If linkedIn enabled or user sent valid linkedIn URL
+                         */
                         } else if (!linkedInLinkParserService.isEnabled() || linkedInLinkParserService.containsValidLinkedInProfileLink(message.getText())) {
                             chatProcessorsMap.get(ProcessorType.VALIDATE_FIRST_MESSAGE).processUpdate(this, update);
                             chatProcessorsMap.get(ProcessorType.DELETE_WELCOME_MESSAGE).processUpdate(this, update);
