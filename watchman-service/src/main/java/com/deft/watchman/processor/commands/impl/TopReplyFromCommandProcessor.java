@@ -1,6 +1,5 @@
 package com.deft.watchman.processor.commands.impl;
 
-import com.deft.watchman.processor.commands.CommandProcessor;
 import com.deft.watchman.processor.commands.CommandType;
 import com.deft.watchman.service.ChatUserAggregatedService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class TopReplyFromCommandProcessor implements CommandProcessor {
+public class TopReplyFromCommandProcessor extends BasicCommandProcessor {
 
     private final ChatUserAggregatedService chatUserAggregatedService;
 
@@ -29,18 +28,14 @@ public class TopReplyFromCommandProcessor implements CommandProcessor {
         Message message = update.getMessage();
         Chat chat = message.getChat();
 
-        List<String> topSpeakers = chatUserAggregatedService.getTopReplyFrom();
-        StringBuilder sb = new StringBuilder();
-        sb.append("TOP Replied Authors:");
-        sb.append("\n");
-        topSpeakers.forEach(s -> {
-            sb.append(s);
-            sb.append("\n");
-        });
+        List<String> topSpeakers = chatUserAggregatedService.getTopReplyFrom(chat.getId());
+        String sb = "TOP Replied Authors:" +
+                "\n" +
+                getResultString(topSpeakers);
 
         SendMessage inviteMessage = SendMessage.builder()
                 .chatId(chat.getId().toString())
-                .text(sb.toString())
+                .text(sb)
                 .build();
 
         bot.silent().execute(inviteMessage);

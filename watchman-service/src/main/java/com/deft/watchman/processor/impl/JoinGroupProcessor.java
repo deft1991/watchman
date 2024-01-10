@@ -8,6 +8,7 @@ import com.deft.watchman.processor.ChatUpdateProcessor;
 import com.deft.watchman.processor.ProcessorType;
 import com.deft.watchman.repository.postgres.MessageDictionaryRepository;
 import com.deft.watchman.service.ChatUserService;
+import com.deft.watchman.service.LinkedInLinkParserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -36,11 +37,17 @@ public class JoinGroupProcessor implements ChatUpdateProcessor {
     private final ChatUserService chatUserService;
     private final ChatUserMapper chatUserMapper;
     private final MessageDictionaryRepository messageDictionaryRepository;
+    private final LinkedInLinkParserService linkedInLinkParserService;
 
 
     @Override
     public void processUpdate(AbilityBot bot, Update update) {
-        Optional<MessageDictionary> byType = messageDictionaryRepository.findByType(MessageType.JOIN_GROUP_MESSAGE);
+        Optional<MessageDictionary> byType;
+        if (linkedInLinkParserService.isEnabled()) {
+            byType = messageDictionaryRepository.findByType(MessageType.JOIN_GROUP_MESSAGE);
+        } else {
+            byType = messageDictionaryRepository.findByType(MessageType.JOIN_GROUP_MESSAGE_WITHOUT_LINKEDIN);
+        }
         MessageDictionary messageDictionary = getMessageDictionary(byType);
 
         Message message = update.getMessage();
@@ -62,7 +69,7 @@ public class JoinGroupProcessor implements ChatUpdateProcessor {
                     chatUser.setLeave(false);
                     chatUser.setJoinGroupTime(Instant.now());
 
-                    String formatted = String.format(messageDictionary.getMessage(), user.getFirstName());
+                String formatted = String.format(messageDictionary.getMessage(), user.getFirstName(), user.getUserName());
                     // Send an invite message
                     if (chatUser.isNewUser()) {
                         SendMessage inviteMessage = SendMessage.builder()

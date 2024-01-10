@@ -70,6 +70,12 @@ public class WatchmanBot extends AbilityBot {
         if (!update.hasMessage() && !update.hasEditedMessage()) {
             return;
         }
+        /*
+         Do nothing if bot
+         */
+        if (isBot(update)) {
+            return;
+        }
         if (update.hasEditedMessage()) {
             Message message = update.getEditedMessage();
             Chat chat = message.getChat();
@@ -123,7 +129,7 @@ public class WatchmanBot extends AbilityBot {
                         /*
                         If user already sent invite message
                          */
-                        if (!isEmptyInviteMessage(userId, chatId)){
+                        if (!isEmptyInviteMessage(userId, chatId)) {
                             executeProcessors(update,
                                     ProcessorType.DELETE_MESSAGE,
                                     ProcessorType.DONT_USE_TAG);
@@ -161,6 +167,20 @@ public class WatchmanBot extends AbilityBot {
         }
     }
 
+    private boolean isBot(Update update) {
+        if (update.getMessage() != null) {
+            Message message = update.getMessage();
+            User from = message.getFrom();
+            return from.getIsBot();
+        } else if (update.hasEditedMessage()) {
+            Message message = update.getEditedMessage();
+            User from = message.getFrom();
+            return from.getIsBot();
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Check message and change statistic
      */
@@ -187,9 +207,6 @@ public class WatchmanBot extends AbilityBot {
     }
 
     private void processJoinGroup(Update update) {
-        if (update.getMessage().getFrom().getIsBot()) {
-            return;
-        }
         chatProcessorsMap.get(ProcessorType.JOIN_GROUP).processUpdate(this, update);
         chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
     }

@@ -1,5 +1,7 @@
 package com.deft.watchman.service;
 
+import lombok.NonNull;
+
 import java.util.List;
 
 /**
@@ -8,13 +10,13 @@ import java.util.List;
  */
 public interface ChatUserAggregatedService {
 
-    List<String> getTopSpeakers();
+    List<String> getTopSpeakers(@NonNull Long id);
 
-    List<String> getTopReplyTo();
+    List<String> getTopReplyTo(@NonNull Long id);
 
-    List<String> getTopReplyFrom();
+    List<String> getTopReplyFrom(@NonNull Long id);
 
-    List<String> getTopRating();
+    List<String> getTopRating(@NonNull Long id);
 
-    List<String> getTopUser();
+    List<String> getTopUser(@NonNull Long id);
 }

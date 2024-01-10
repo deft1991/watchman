@@ -1,6 +1,5 @@
 package com.deft.watchman.processor.commands.impl;
 
-import com.deft.watchman.processor.commands.CommandProcessor;
 import com.deft.watchman.processor.commands.CommandType;
 import org.springframework.stereotype.Service;
 import org.telegram.abilitybots.api.bot.AbilityBot;
@@ -17,7 +16,7 @@ import java.util.Arrays;
  */
 
 @Service
-public class HelpCommandProcessor implements CommandProcessor {
+public class HelpCommandProcessor extends BasicCommandProcessor {
 
 
     @Override

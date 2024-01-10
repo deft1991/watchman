@@ -1,7 +1,6 @@
 package com.deft.watchman.processor.commands.impl;
 
 import com.deft.watchman.data.entity.postgres.ChatUser;
-import com.deft.watchman.processor.commands.CommandProcessor;
 import com.deft.watchman.processor.commands.CommandType;
 import com.deft.watchman.service.ChatUserService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,7 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AddRatingProcessor implements CommandProcessor {
+public class AddRatingProcessor extends BasicCommandProcessor {
 
     private final ChatUserService chatUserService;
 

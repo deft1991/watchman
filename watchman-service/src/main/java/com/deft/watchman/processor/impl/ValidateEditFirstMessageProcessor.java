@@ -69,7 +69,7 @@ public class ValidateEditFirstMessageProcessor implements ChatUpdateProcessor {
         chatUser.setLinkedinUrl(linkedInProfileLink);
         // todo we can add other message checks
 
-        String formatted = String.format(messageDictionary.getMessage(), fromUser.getFirstName());
+        String formatted = String.format(messageDictionary.getMessage(), fromUser.getFirstName(), fromUser.getUserName());
         SendMessage inviteMessage = SendMessage.builder()
                 .chatId(chat.getId().toString())
                 .text(formatted)
