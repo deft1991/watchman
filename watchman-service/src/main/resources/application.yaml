@@ -71,9 +71,13 @@ telegram:
     whois:
       enable: true
       pattern: \s#whois\s|\s#whois$|^#whois\s|^#whois$
+    news:
+      pattern: \s#news\s|\s#news$|^#news\s|^#news$
 scheduler:
   ban:
     fixed-rate:
       in:
         milliseconds: 600_000
     wait-time-seconds: 120
+  news:
+    cron: '0 0 1 * * SUN'

@@ -6,6 +6,7 @@ import com.deft.watchman.processor.ChatUpdateProcessor;
 import com.deft.watchman.processor.ProcessorType;
 import com.deft.watchman.processor.commands.CommandProcessor;
 import com.deft.watchman.processor.commands.CommandType;
+import com.deft.watchman.service.ChatNewsService;
 import com.deft.watchman.service.ChatUserService;
 import com.deft.watchman.service.LinkedInLinkParserService;
 import com.deft.watchman.service.WhoisParserService;
@@ -40,12 +41,15 @@ public class WatchmanBot extends AbilityBot {
     private final LinkedInLinkParserService linkedInLinkParserService;
     private final WhoisParserService whoisParserService;
 
+    private final ChatNewsService chatNewsService;
+
 
     public WatchmanBot(Environment environment,
                        List<ChatUpdateProcessor> processors,
                        ChatUserService chatUserService,
                        LinkedInLinkParserService linkedInLinkParserService,
                        WhoisParserService whoisParserService,
+                       ChatNewsService chatNewsService,
                        List<CommandProcessor> commandProcessors) {
         super(environment.getProperty("telegram.bot.token"), environment.getProperty("telegram.bot.userName"));
         chatProcessorsMap = processors.stream()
@@ -55,6 +59,7 @@ public class WatchmanBot extends AbilityBot {
                 .collect(Collectors.toMap(CommandProcessor::getProcessorType, p -> p));
         this.linkedInLinkParserService = linkedInLinkParserService;
         this.whoisParserService = whoisParserService;
+        this.chatNewsService = chatNewsService;
     }
 
     @Override
@@ -156,10 +161,17 @@ public class WatchmanBot extends AbilityBot {
                     For old users ->
                     if user send message with #whois tag we should remove it and show message like dont do it
                      */
+                    if (update.hasEditedMessage()) {
+                        message = update.getEditedMessage();
+                    }
+
                     if (whoisParserService.containsValidTag(message.getText())) {
                         executeProcessors(update,
                                 ProcessorType.DELETE_MESSAGE,
                                 ProcessorType.DONT_USE_TAG);
+                    }
+                    if (chatNewsService.containsNews(message.getText())) {
+                        chatNewsService.addNews(message.getText(), message.getChat().getId());
                     }
                     processStatistics(userId, chatId, fromUser, message);
                 }

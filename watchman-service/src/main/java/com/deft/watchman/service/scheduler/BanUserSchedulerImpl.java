@@ -1,4 +1,4 @@
-package com.deft.watchman.service.impl;
+package com.deft.watchman.service.scheduler;
 
 import com.deft.watchman.bot.WatchmanBot;
 import com.deft.watchman.data.entity.postgres.ChatUser;
