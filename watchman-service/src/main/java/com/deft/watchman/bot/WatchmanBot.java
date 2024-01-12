@@ -171,12 +171,22 @@ public class WatchmanBot extends AbilityBot {
                                 ProcessorType.DONT_USE_TAG);
                     }
                     if (chatNewsService.containsNews(message.getText())) {
-                        chatNewsService.addNews(message.getText(), message.getChat().getId());
+                        processNews(message);
                     }
                     processStatistics(userId, chatId, fromUser, message);
                 }
             }
         }
+    }
+
+    private void processNews(Message message) {
+        String text;
+        if (message.isReply()){
+            text = message.getReplyToMessage().getText();
+        } else {
+            text = message.getText();
+        }
+        chatNewsService.addNews(text, message.getChat().getId());
     }
 
     private boolean isBot(Update update) {
