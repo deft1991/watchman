@@ -6,7 +6,7 @@ import com.deft.watchman.processor.ChatUpdateProcessor;
 import com.deft.watchman.processor.ProcessorType;
 import com.deft.watchman.processor.commands.CommandProcessor;
 import com.deft.watchman.processor.commands.CommandType;
-import com.deft.watchman.service.ChatNewsService;
+import com.deft.watchman.processor.hashtag.HashTagProcessorChain;
 import com.deft.watchman.service.ChatUserService;
 import com.deft.watchman.service.LinkedInLinkParserService;
 import com.deft.watchman.service.WhoisParserService;
@@ -41,7 +41,7 @@ public class WatchmanBot extends AbilityBot {
     private final LinkedInLinkParserService linkedInLinkParserService;
     private final WhoisParserService whoisParserService;
 
-    private final ChatNewsService chatNewsService;
+    private final HashTagProcessorChain hashTagProcessorChain;
 
 
     public WatchmanBot(Environment environment,
@@ -49,7 +49,7 @@ public class WatchmanBot extends AbilityBot {
                        ChatUserService chatUserService,
                        LinkedInLinkParserService linkedInLinkParserService,
                        WhoisParserService whoisParserService,
-                       ChatNewsService chatNewsService,
+                       HashTagProcessorChain hashTagProcessorChain,
                        List<CommandProcessor> commandProcessors) {
         super(environment.getProperty("telegram.bot.token"), environment.getProperty("telegram.bot.userName"));
         chatProcessorsMap = processors.stream()
@@ -59,7 +59,7 @@ public class WatchmanBot extends AbilityBot {
                 .collect(Collectors.toMap(CommandProcessor::getProcessorType, p -> p));
         this.linkedInLinkParserService = linkedInLinkParserService;
         this.whoisParserService = whoisParserService;
-        this.chatNewsService = chatNewsService;
+        this.hashTagProcessorChain = hashTagProcessorChain;
     }
 
     @Override
@@ -128,6 +128,8 @@ public class WatchmanBot extends AbilityBot {
                 - if no ban user
                 - if so - then check linked in link in message
                  todo - I need to do it more flexible. I don't like a lot of if cases
+                 todo - just an idea, we can try to rewrite it to chain of responsibility
+
                  */
                 if (isNewUser(userId, chatId)) {
                     if (whoisParserService.containsValidTag(message.getText())) {
@@ -170,23 +172,17 @@ public class WatchmanBot extends AbilityBot {
                                 ProcessorType.DELETE_MESSAGE,
                                 ProcessorType.DONT_USE_TAG);
                     }
-                    if (chatNewsService.containsNews(message.getText())) {
-                        processNews(message);
-                    }
+                    /*
+                    Call chain of responsibility with hashTagProcessorChain
+                     */
+                    hashTagProcessorChain.check(message);
+                    /*
+                    Call statistics
+                     */
                     processStatistics(userId, chatId, fromUser, message);
                 }
             }
         }
-    }
-
-    private void processNews(Message message) {
-        String text;
-        if (message.isReply()){
-            text = message.getReplyToMessage().getText();
-        } else {
-            text = message.getText();
-        }
-        chatNewsService.addNews(text, message.getChat().getId());
     }
 
     private boolean isBot(Update update) {

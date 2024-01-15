@@ -73,6 +73,8 @@ telegram:
       pattern: \s#whois\s|\s#whois$|^#whois\s|^#whois$
     news:
       pattern: \s#news\s|\s#news$|^#news\s|^#news$
+    suggest-topic:
+      pattern: \s#suggest_topic\s|\s#suggest_topic$|^#suggest_topic\s|^#suggest_topic$
 scheduler:
   ban:
     fixed-rate:

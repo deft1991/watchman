@@ -41,7 +41,7 @@ public class ChatNewsServiceImpl implements ChatNewsService {
     public void addNews(@NonNull String message, @NonNull Long chatId) {
         message = message.replaceAll(HASHTAG_NEWS, "");
         ChatNews cn = new ChatNews(chatId, message);
-
+        log.info("Add news: {} to chat: {}", message, chatId);
         chatNewsRepository.save(cn);
     }
 
