@@ -3,7 +3,6 @@ package com.deft.watchman.processor.impl;
 import com.deft.watchman.data.entity.postgres.ChatSettings;
 import com.deft.watchman.processor.ChatUpdateProcessor;
 import com.deft.watchman.processor.ProcessorType;
-import com.deft.watchman.service.ChatUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -21,8 +20,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @Component
 @RequiredArgsConstructor
 public class DeleteMessageProcessor implements ChatUpdateProcessor {
-
-    private final ChatUserService chatUserService;
 
     /**
      * Delete the Telegram's default message about user leaving

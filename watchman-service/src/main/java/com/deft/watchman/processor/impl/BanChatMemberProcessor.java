@@ -3,7 +3,6 @@ package com.deft.watchman.processor.impl;
 import com.deft.watchman.data.entity.postgres.ChatSettings;
 import com.deft.watchman.processor.ChatUpdateProcessor;
 import com.deft.watchman.processor.ProcessorType;
-import com.deft.watchman.service.ChatUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,8 +22,6 @@ import org.telegram.telegrambots.meta.api.objects.User;
 @Component
 @RequiredArgsConstructor
 public class BanChatMemberProcessor implements ChatUpdateProcessor {
-
-    private final ChatUserService chatUserService; // todo maybe change user if left
 
     @Value("${telegram.bot.ban-seconds:120}")
     private int banSeconds;
