@@ -9,7 +9,6 @@ import com.deft.watchman.processor.ChatUpdateProcessor;
 import com.deft.watchman.processor.ProcessorType;
 import com.deft.watchman.repository.postgres.MessageDictionaryRepository;
 import com.deft.watchman.service.ChatUserService;
-import com.deft.watchman.service.LinkedInLinkParserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -38,8 +37,6 @@ public class JoinGroupProcessor implements ChatUpdateProcessor {
     private final ChatUserService chatUserService;
     private final ChatUserMapper chatUserMapper;
     private final MessageDictionaryRepository messageDictionaryRepository;
-    private final LinkedInLinkParserService linkedInLinkParserService;
-
 
     @Override
     public void processUpdate(AbilityBot bot, Update update, ChatSettings settings) {

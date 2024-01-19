@@ -12,16 +12,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class WhoisParserServiceImpl implements WhoisParserService {
 
-    @Value("${telegram.bot.whois.enable:true}")
-    private boolean isEnable;
-
     @Value("${telegram.bot.whois.pattern}")
     private String textPattern;
-
-    @Override
-    public String extractTag(String input) {
-        return ParserServiceHelper.extractTextByPattern(input, textPattern);
-    }
 
     @Override
     public boolean containsValidTag(String input) {

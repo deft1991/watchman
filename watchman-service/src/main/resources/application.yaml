@@ -68,7 +68,6 @@ telegram:
     linkedin:
       pattern: (https?://)?(www\.)?linkedin\.com/in/\w+/?
     whois:
-      enable: true
       pattern: \s#whois\s|\s#whois$|^#whois\s|^#whois$
     news:
       pattern: \s#news\s|\s#news$|^#news\s|^#news$
