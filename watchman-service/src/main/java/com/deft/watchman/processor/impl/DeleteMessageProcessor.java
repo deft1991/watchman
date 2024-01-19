@@ -1,5 +1,6 @@
 package com.deft.watchman.processor.impl;
 
+import com.deft.watchman.data.entity.postgres.ChatSettings;
 import com.deft.watchman.processor.ChatUpdateProcessor;
 import com.deft.watchman.processor.ProcessorType;
 import com.deft.watchman.service.ChatUserService;
@@ -27,7 +28,7 @@ public class DeleteMessageProcessor implements ChatUpdateProcessor {
      * Delete the Telegram's default message about user leaving
      */
     @Override
-    public void processUpdate(AbilityBot bot, Update update) {
+    public void processUpdate(AbilityBot bot, Update update, ChatSettings settings) {
         Message message = update.getMessage();
         Message editedMessage = update.getEditedMessage();
         DeleteMessage deleteMessage = null;

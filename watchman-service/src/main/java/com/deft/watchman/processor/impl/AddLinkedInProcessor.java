@@ -1,5 +1,6 @@
 package com.deft.watchman.processor.impl;
 
+import com.deft.watchman.data.entity.postgres.ChatSettings;
 import com.deft.watchman.data.entity.postgres.ChatUser;
 import com.deft.watchman.data.entity.postgres.MessageDictionary;
 import com.deft.watchman.data.entity.postgres.MessageType;
@@ -44,7 +45,7 @@ public class AddLinkedInProcessor implements ChatUpdateProcessor {
 
 
     @Override
-    public void processUpdate(AbilityBot bot, Update update) {
+    public void processUpdate(AbilityBot bot, Update update, ChatSettings settings) {
         if (!isNeedLinkedIn) {
             return;
         }

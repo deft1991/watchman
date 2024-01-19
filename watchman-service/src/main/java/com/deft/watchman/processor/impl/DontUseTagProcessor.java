@@ -1,5 +1,6 @@
 package com.deft.watchman.processor.impl;
 
+import com.deft.watchman.data.entity.postgres.ChatSettings;
 import com.deft.watchman.data.entity.postgres.MessageDictionary;
 import com.deft.watchman.data.entity.postgres.MessageType;
 import com.deft.watchman.processor.ChatUpdateProcessor;
@@ -33,7 +34,7 @@ public class DontUseTagProcessor implements ChatUpdateProcessor {
     private final MessageDictionaryRepository messageDictionaryRepository;
 
     @Override
-    public void processUpdate(AbilityBot bot, Update update) {
+    public void processUpdate(AbilityBot bot, Update update, ChatSettings settings) {
         Message message = update.getMessage();
         Chat chat = message.getChat();
         User user = message.getFrom();

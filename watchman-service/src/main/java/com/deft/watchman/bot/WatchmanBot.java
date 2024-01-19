@@ -1,12 +1,14 @@
 package com.deft.watchman.bot;
 
 
+import com.deft.watchman.data.entity.postgres.ChatSettings;
 import com.deft.watchman.data.entity.postgres.ChatUser;
 import com.deft.watchman.processor.ChatUpdateProcessor;
 import com.deft.watchman.processor.ProcessorType;
 import com.deft.watchman.processor.commands.CommandProcessor;
 import com.deft.watchman.processor.commands.CommandType;
 import com.deft.watchman.processor.hashtag.HashTagProcessorChain;
+import com.deft.watchman.service.ChatSettingsService;
 import com.deft.watchman.service.ChatUserService;
 import com.deft.watchman.service.LinkedInLinkParserService;
 import com.deft.watchman.service.WhoisParserService;
@@ -42,6 +44,7 @@ public class WatchmanBot extends AbilityBot {
     private final WhoisParserService whoisParserService;
 
     private final HashTagProcessorChain hashTagProcessorChain;
+    private final ChatSettingsService chatSettingsService;
 
 
     public WatchmanBot(Environment environment,
@@ -50,6 +53,7 @@ public class WatchmanBot extends AbilityBot {
                        LinkedInLinkParserService linkedInLinkParserService,
                        WhoisParserService whoisParserService,
                        HashTagProcessorChain hashTagProcessorChain,
+                       ChatSettingsService chatSettingsService,
                        List<CommandProcessor> commandProcessors) {
         super(environment.getProperty("telegram.bot.token"), environment.getProperty("telegram.bot.userName"));
         chatProcessorsMap = processors.stream()
@@ -60,6 +64,7 @@ public class WatchmanBot extends AbilityBot {
         this.linkedInLinkParserService = linkedInLinkParserService;
         this.whoisParserService = whoisParserService;
         this.hashTagProcessorChain = hashTagProcessorChain;
+        this.chatSettingsService = chatSettingsService;
     }
 
     @Override
@@ -81,38 +86,55 @@ public class WatchmanBot extends AbilityBot {
         if (isBot(update)) {
             return;
         }
+
+        /*
+        All processors depend on ChatSettings
+        We need to get or create chat settings
+         */
+        ChatSettings chatSettings;
         if (update.hasEditedMessage()) {
+            Message message = update.getEditedMessage();
+            Chat chat = message.getChat();
+            chatSettings = chatSettingsService.getChatSettings(chat.getId(), chat.getTitle());
+        } else {
+            Message message = update.getMessage();
+            Chat chat = message.getChat();
+            chatSettings = chatSettingsService.getChatSettings(chat.getId(), chat.getTitle());
+        }
+
+        if (isCommand(update)) {
+            processCommand(update, chatSettings);
+        } else if (isLeftChat(update)) {
+            executeProcessors(update, chatSettings,
+                    ProcessorType.DELETE_MESSAGE,
+                    ProcessorType.DELETE_WELCOME_MESSAGE,
+                    ProcessorType.LEAVE_GROUP,
+                    ProcessorType.DELETE_INVITE_MESSAGE);
+        } else if (isJoinGroup(update)) {
+            processJoinGroup(update, chatSettings);
+        } else if (update.hasEditedMessage()) {
             Message message = update.getEditedMessage();
             Chat chat = message.getChat();
             User fromUser = message.getFrom();
             Long userId = fromUser.getId();
             Long chatId = chat.getId();
+
             if (chat.isGroupChat() || chat.isSuperGroupChat()) {
                 if (isNewUser(userId, chatId)) {
                     if (whoisParserService.containsValidTag(message.getText())
-                            && linkedInLinkParserService.isEnabled()
+                            && chatSettings.isLinkedinEnable()
                             && linkedInLinkParserService.containsValidLinkedInProfileLink(message.getText())) {
-                        executeProcessors(update,
+                        executeProcessors(update, chatSettings,
                                 ProcessorType.VALIDATE_EDIT_FIRST_MESSAGE,
                                 ProcessorType.DELETE_ADD_LINKEDIN_MESSAGE);
                     } else {
-                        executeProcessors(update,
+                        executeProcessors(update, chatSettings,
                                 ProcessorType.BAN_CHAT_MEMBER,
                                 ProcessorType.DELETE_MESSAGE,
                                 ProcessorType.DELETE_WELCOME_MESSAGE);
                     }
                 }
             }
-        } else if (update.getMessage().isCommand()) {
-            processCommand(update);
-        } else if (isLeftChat(update)) {
-            executeProcessors(update,
-                    ProcessorType.DELETE_MESSAGE,
-                    ProcessorType.DELETE_WELCOME_MESSAGE,
-                    ProcessorType.LEAVE_GROUP,
-                    ProcessorType.DELETE_INVITE_MESSAGE);
-        } else if (isJoinGroup(update)) {
-            processJoinGroup(update);
         } else if (update.getMessage().hasText()) {
             Message message = update.getMessage();
             Chat chat = message.getChat();
@@ -137,23 +159,23 @@ public class WatchmanBot extends AbilityBot {
                         If user already sent invite message
                          */
                         if (!isEmptyInviteMessage(userId, chatId)) {
-                            executeProcessors(update,
+                            executeProcessors(update, chatSettings,
                                     ProcessorType.DELETE_MESSAGE,
                                     ProcessorType.DONT_USE_TAG);
                         /*
                         If linkedIn enabled or user sent valid linkedIn URL
                          */
-                        } else if (!linkedInLinkParserService.isEnabled() || linkedInLinkParserService.containsValidLinkedInProfileLink(message.getText())) {
-                            executeProcessors(update,
+                        } else if (!chatSettings.isLinkedinEnable() || linkedInLinkParserService.containsValidLinkedInProfileLink(message.getText())) {
+                            executeProcessors(update, chatSettings,
                                     ProcessorType.VALIDATE_FIRST_MESSAGE,
                                     ProcessorType.DELETE_WELCOME_MESSAGE);
-                        } else if (linkedInLinkParserService.isEnabled()) {
-                            executeProcessors(update,
+                        } else if (chatSettings.isLinkedinEnable()) {
+                            executeProcessors(update, chatSettings,
                                     ProcessorType.DELETE_WELCOME_MESSAGE,
                                     ProcessorType.ADD_LINKEDIN);
                         }
                     } else {
-                        executeProcessors(update,
+                        executeProcessors(update, chatSettings,
                                 ProcessorType.BAN_CHAT_MEMBER,
                                 ProcessorType.DELETE_MESSAGE,
                                 ProcessorType.DELETE_WELCOME_MESSAGE);
@@ -168,7 +190,7 @@ public class WatchmanBot extends AbilityBot {
                     }
 
                     if (whoisParserService.containsValidTag(message.getText())) {
-                        executeProcessors(update,
+                        executeProcessors(update, chatSettings,
                                 ProcessorType.DELETE_MESSAGE,
                                 ProcessorType.DONT_USE_TAG);
                     }
@@ -183,6 +205,10 @@ public class WatchmanBot extends AbilityBot {
                 }
             }
         }
+    }
+
+    private static boolean isCommand(Update update) {
+        return update.getMessage().isCommand();
     }
 
     private boolean isBot(Update update) {
@@ -224,22 +250,22 @@ public class WatchmanBot extends AbilityBot {
         }
     }
 
-    private void processJoinGroup(Update update) {
-        chatProcessorsMap.get(ProcessorType.JOIN_GROUP).processUpdate(this, update);
-        chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update);
+    private void processJoinGroup(Update update, ChatSettings chatSettings) {
+        chatProcessorsMap.get(ProcessorType.JOIN_GROUP).processUpdate(this, update, chatSettings);
+        chatProcessorsMap.get(ProcessorType.DELETE_MESSAGE).processUpdate(this, update, chatSettings);
     }
 
-    private void processCommand(Update update) {
+    private void processCommand(Update update, ChatSettings chatSettings) {
         Message message = update.getMessage();
         String text = message.getText() + " ";
         String command = text.substring(1, text.indexOf(" ")).toUpperCase();
         if (EnumUtils.isValidEnum(CommandType.class, command)) {
-            commandProcessorMap.get(CommandType.valueOf(command.toUpperCase())).processCommand(this, update);
+            commandProcessorMap.get(CommandType.valueOf(command.toUpperCase())).processCommand(this, update, chatSettings);
         }
     }
 
-    private void executeProcessors(Update update, ProcessorType... processorTypes) {
-        Arrays.stream(processorTypes).forEach(type -> chatProcessorsMap.get(type).processUpdate(this, update));
+    private void executeProcessors(Update update, ChatSettings chatSettings, ProcessorType... processorTypes) {
+        Arrays.stream(processorTypes).forEach(type -> chatProcessorsMap.get(type).processUpdate(this, update, chatSettings));
     }
 
     private boolean isNewUser(Long userId, Long chatId) {

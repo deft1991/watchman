@@ -9,5 +9,4 @@ public interface WhoisParserService {
     String extractTag(String input);
     boolean containsValidTag(String input);
 
-    boolean isEnabled();
 }

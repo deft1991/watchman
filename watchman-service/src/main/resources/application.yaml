@@ -66,7 +66,6 @@ telegram:
     userName: "Суровый Вахтер"
     ban-seconds: 60
     linkedin:
-      enable: true
       pattern: (https?://)?(www\.)?linkedin\.com/in/\w+/?
     whois:
       enable: true
@@ -83,3 +82,7 @@ scheduler:
     wait-time-seconds: 120
   news:
     cron: '0 0 1 * * SUN'
+chat:
+  default:
+    language: RUS
+    linkedin-enable: true

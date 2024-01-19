@@ -1,17 +1,15 @@
 package com.deft.watchman.processor.impl;
 
+import com.deft.watchman.data.entity.postgres.ChatSettings;
 import com.deft.watchman.data.entity.postgres.ChatUser;
-import com.deft.watchman.mapper.ChatUserMapper;
 import com.deft.watchman.processor.ChatUpdateProcessor;
 import com.deft.watchman.processor.ProcessorType;
-import com.deft.watchman.repository.postgres.MessageDictionaryRepository;
 import com.deft.watchman.service.ChatUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.abilitybots.api.bot.AbilityBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -33,7 +31,7 @@ public class LeaveGroupProcessor implements ChatUpdateProcessor {
     private final ChatUserService chatUserService;
 
     @Override
-    public void processUpdate(AbilityBot bot, Update update) {
+    public void processUpdate(AbilityBot bot, Update update, ChatSettings settings) {
         Message message = update.getMessage();
         Chat chat = message.getChat();
         User user = message.getFrom();

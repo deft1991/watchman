@@ -1,5 +1,6 @@
 package com.deft.watchman.processor.commands.impl;
 
+import com.deft.watchman.data.entity.postgres.ChatSettings;
 import com.deft.watchman.processor.commands.CommandType;
 import com.deft.watchman.service.ChatUserAggregatedService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class TopReplyToCommandProcessor extends BasicCommandProcessor {
     private final ChatUserAggregatedService chatUserAggregatedService;
 
     @Override
-    public void processCommand(AbilityBot bot, Update update) {
+    public void processCommand(AbilityBot bot, Update update, ChatSettings chatSettings) {
         Message message = update.getMessage();
         Chat chat = message.getChat();
 

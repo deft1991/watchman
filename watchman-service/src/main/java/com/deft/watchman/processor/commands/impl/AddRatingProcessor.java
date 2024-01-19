@@ -1,5 +1,6 @@
 package com.deft.watchman.processor.commands.impl;
 
+import com.deft.watchman.data.entity.postgres.ChatSettings;
 import com.deft.watchman.data.entity.postgres.ChatUser;
 import com.deft.watchman.processor.commands.CommandType;
 import com.deft.watchman.service.ChatUserService;
@@ -27,7 +28,7 @@ public class AddRatingProcessor extends BasicCommandProcessor {
     private final ChatUserService chatUserService;
 
     @Override
-    public void processCommand(AbilityBot bot, Update update) {
+    public void processCommand(AbilityBot bot, Update update, ChatSettings chatSettings) {
         Message message = update.getMessage();
         Chat chat = message.getChat();
         Optional<MessageEntity> mention = message.getEntities().stream().filter(e -> e.getType().equals("mention")).findFirst();

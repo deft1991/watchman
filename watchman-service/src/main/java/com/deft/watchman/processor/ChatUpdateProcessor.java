@@ -1,5 +1,6 @@
 package com.deft.watchman.processor;
 
+import com.deft.watchman.data.entity.postgres.ChatSettings;
 import org.telegram.abilitybots.api.bot.AbilityBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -9,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
  */
 public interface ChatUpdateProcessor {
 
-    void processUpdate(AbilityBot bot, Update update);
+    void processUpdate(AbilityBot bot, Update update, ChatSettings settings);
 
     ProcessorType getProcessorType();
 }

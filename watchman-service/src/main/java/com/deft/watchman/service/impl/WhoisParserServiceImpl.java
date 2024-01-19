@@ -28,11 +28,4 @@ public class WhoisParserServiceImpl implements WhoisParserService {
         return ParserServiceHelper.isValidInput(input, textPattern);
     }
 
-    /**
-     * Todo add code for it later
-     */
-    @Override
-    public boolean isEnabled() {
-        return isEnable;
-    }
 }

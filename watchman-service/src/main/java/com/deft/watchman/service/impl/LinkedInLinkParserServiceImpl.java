@@ -12,9 +12,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class LinkedInLinkParserServiceImpl implements LinkedInLinkParserService {
 
-    @Value("${telegram.bot.linkedin.enable:true}")
-    private boolean isEnable;
-
     @Value("${telegram.bot.linkedin.pattern}")
     private String textPattern;
 
@@ -28,8 +25,4 @@ public class LinkedInLinkParserServiceImpl implements LinkedInLinkParserService 
         return ParserServiceHelper.isValidInput(input, textPattern);
     }
 
-    @Override
-    public boolean isEnabled() {
-        return isEnable;
-    }
 }

@@ -1,5 +1,6 @@
 package com.deft.watchman.processor.impl;
 
+import com.deft.watchman.data.entity.postgres.ChatSettings;
 import com.deft.watchman.data.entity.postgres.ChatUser;
 import com.deft.watchman.data.entity.postgres.MessageDictionary;
 import com.deft.watchman.data.entity.postgres.MessageType;
@@ -41,9 +42,9 @@ public class JoinGroupProcessor implements ChatUpdateProcessor {
 
 
     @Override
-    public void processUpdate(AbilityBot bot, Update update) {
+    public void processUpdate(AbilityBot bot, Update update, ChatSettings settings) {
         Optional<MessageDictionary> byType;
-        if (linkedInLinkParserService.isEnabled()) {
+        if (settings.isLinkedinEnable()) {
             byType = messageDictionaryRepository.findByType(MessageType.JOIN_GROUP_MESSAGE);
         } else {
             byType = messageDictionaryRepository.findByType(MessageType.JOIN_GROUP_MESSAGE_WITHOUT_LINKEDIN);
