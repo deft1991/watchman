@@ -1,0 +1,55 @@
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /watcher
+
+spring:
+  thread-executor: virtual
+  application:
+    name: watcher-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/watcher_server
+    username: watcher_server
+    password: watcher_server
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        use_sql_comments: true
+        format_sql: true
+        generate_statistics: true
+        session.events.log: true
+
+  #  data:
+  #    redis:
+  #      host: localhost
+  #      port: 6379
+  #      password: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+
+  # End Gateway Configuration
+
+logging:
+  level:
+    root: ERROR
+    com:
+      deft: DEBUG
+    org:
+      springframework:
+        security: DEBUG
+      hibernate:
+        SQL: DEBUG
+        cache: DEBUG
+        stat: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+
+# Launch the default browser when starting the application in development mode
+vaadin:
+  launch-browser: true
+  # To improve the performance during development.
+  # For more information https://vaadin.com/docs/flow/spring/tutorial-spring-configuration.html#special-configuration-parameters
+  whitelisted-packages: com.vaadin,org.vaadin,dev.hilla,com.deft.admin

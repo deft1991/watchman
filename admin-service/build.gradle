@@ -1,0 +1,33 @@
+plugins {
+    id("com.vaadin") version "24.3.3"
+}
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+}
+
+dependencies {
+    implementation('com.vaadin:vaadin-spring-boot-starter')
+    implementation('com.vaadin:vaadin')
+    implementation('org.parttio:line-awesome:2.0.0')
+
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation('com.vaadin:vaadin-testbench-junit5')
+
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "com.vaadin:vaadin-bom:$vaadinVersion"
+    }
+}

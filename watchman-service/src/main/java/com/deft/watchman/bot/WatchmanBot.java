@@ -14,6 +14,8 @@ import com.deft.watchman.service.LinkedInLinkParserService;
 import com.deft.watchman.service.WhoisParserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.telegram.abilitybots.api.bot.AbilityBot;
@@ -35,6 +37,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class WatchmanBot extends AbilityBot {
 
     private final Map<ProcessorType, ChatUpdateProcessor> chatProcessorsMap;

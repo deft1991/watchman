@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
   servlet:
     context-path: /watcher
 
@@ -26,18 +26,18 @@ spring:
           use_second_level_cache: true
           region:
             factory_class: org.hibernate.cache.jcache.internal.JCacheRegionFactory
-#            factory_class: org.redisson.hibernate.RedissonRegionFactory
+        #            factory_class: org.redisson.hibernate.RedissonRegionFactory
         javax:
           cache:
             provider: org.ehcache.jsr107.EhcacheCachingProvider
             uri: ehcache.xml
           missing_cache_strategy: fail
 
-#  data:
-#    redis:
-#      host: localhost
-#      port: 6379
-#      password: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+  #  data:
+  #    redis:
+  #      host: localhost
+  #      port: 6379
+  #      password: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
 
   # End Gateway Configuration
 
@@ -78,10 +78,18 @@ scheduler:
     fixed-rate:
       in:
         milliseconds: 600_000
-    wait-time-seconds: 1800
+    wait-time-seconds: 120
   news:
     cron: '0 0 1 * * SUN'
 chat:
   default:
     language: RUS
     linkedin-enable: true
+
+
+# Launch the default browser when starting the application in development mode
+vaadin:
+  launch-browser: true
+  # To improve the performance during development.
+  # For more information https://vaadin.com/docs/flow/spring/tutorial-spring-configuration.html#special-configuration-parameters
+  whitelisted-packages: com.vaadin,org.vaadin,dev.hilla,com.deft.admin
