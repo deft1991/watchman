@@ -33,8 +33,8 @@ public class ChatNewsSchedulerImpl {
     @Async
 //    second, minute, hour, day of month, month, day(s) of week
 //    To have a job run every SUNDAY at 1 AM
-//    @Scheduled(cron = "${scheduler.news.cron:0 0 1 * * SUN}")
-    @Scheduled(cron = "*/10 * * * * ?")
+    @Scheduled(cron = "${scheduler.news.cron:0 0 1 * * SUN}")
+//    @Scheduled(cron = "*/10 * * * * ?")
     public void showNews() {
         Map<Long, List<String>> news = chatNewsService.getNews();
 
