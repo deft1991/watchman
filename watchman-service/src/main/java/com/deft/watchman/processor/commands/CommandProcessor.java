@@ -16,5 +16,10 @@ public interface CommandProcessor {
 
     CommandType getProcessorType();
 
+    /**
+     * Parse message and get command string like "/command "
+     */
+    String getCommandString(String message);
+
     String getResultString(List<String> users);
 }

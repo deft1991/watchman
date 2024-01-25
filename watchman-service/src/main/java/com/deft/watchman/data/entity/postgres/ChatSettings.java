@@ -27,5 +27,6 @@ public class ChatSettings extends BaseEntity {
     private String chatName;
     private String chatLanguage;
     private boolean linkedinEnable;
+    private int banWaitTimeSeconds;
 
 }

@@ -20,4 +20,9 @@ public abstract class BasicCommandProcessor implements CommandProcessor {
         });
         return sb.toString();
     }
+
+    @Override
+    public String getCommandString(String message) {
+        return "/" + getProcessorType().toString().toLowerCase() + " ";
+    }
 }
