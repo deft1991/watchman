@@ -15,8 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.BanChatMember;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Set;
 
 /**
@@ -38,15 +36,13 @@ public class BanUserSchedulerImpl implements BanUserScheduler {
     private int banSeconds;
 
     @Value("${scheduler.ban.wait-time-seconds:300}")
-    private int waitTime;
+    private int banWaitTimeSeconds;
 
     @Override
     @Async
     @Scheduled(fixedDelayString = "${scheduler.ban.fixed-rate.in.milliseconds:600_000}")
     public void banUser() {
-        Instant kickTime = Instant.now().minus(waitTime, ChronoUnit.SECONDS);
-        Set<ChatUser> allByNewUserTrue = chatUserRepository
-                .findAllByNewUserTrueAndLeaveFalseAndJoinGroupTimeIsBefore(kickTime);
+        Set<ChatUser> allByNewUserTrue = chatUserRepository.findUsersForBan(banWaitTimeSeconds);
         for (ChatUser chatUser : allByNewUserTrue) {
             chatUser.setLeave(true);
 

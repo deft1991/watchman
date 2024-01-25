@@ -9,7 +9,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 
@@ -27,7 +26,16 @@ public interface ChatUserRepository extends CrudRepository<ChatUser, Long> {
     @QueryHints(@QueryHint(name = HibernateHints.HINT_CACHEABLE, value = "true"))
     Optional<ChatUser> findByUserNameAndChatId(String username, Long chatId);
 
-    Set<ChatUser> findAllByNewUserTrueAndLeaveFalseAndJoinGroupTimeIsBefore(Instant time);
+    @Query(value = """ 
+            select cu.* from chat_user cu
+            left join chat_settings cs on cu.chat_id = cs.chat_id
+            where
+                cu.new_user = true
+                and cu.leave = false
+                and cu.join_group_time < now() - COALESCE(INTERVAL '1 second' * cs.ban_wait_time_seconds, INTERVAL '1 seconds' * :defaultValue);
+              """, nativeQuery = true
+    )
+    Set<ChatUser> findUsersForBan(int defaultValue);
 
     Set<ChatUser> findTop5ByChatIdOrderByMessageCountDesc(Long chatId);
 

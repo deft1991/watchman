@@ -26,6 +26,8 @@ public class ChatSettingsServiceImpl implements ChatSettingsService {
     private String defaultLanguage;
     @Value("${chat.default.linkedin-enable:true}")
     private boolean linkedInEnable;
+    @Value("${scheduler.ban.wait-time-seconds:300}")
+    private int banWaitTimeSeconds;
 
     private final ChatSettingsRepository chatSettingsRepository;
 
@@ -44,6 +46,7 @@ public class ChatSettingsServiceImpl implements ChatSettingsService {
                     .chatLanguage(defaultLanguage)
                     .chatName(chatName)
                     .linkedinEnable(linkedInEnable)
+                    .banWaitTimeSeconds(banWaitTimeSeconds)
                     .build();
             return chatSettingsRepository.save(chatSettings);
         } else {

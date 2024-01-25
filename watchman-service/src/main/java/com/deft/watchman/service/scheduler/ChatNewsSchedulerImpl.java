@@ -51,6 +51,7 @@ public class ChatNewsSchedulerImpl {
                 sb.append(". ");
                 sb.append(value.get(i));
                 sb.append("\n");
+                sb.append("\n");
             }
 
             SendMessage inviteMessage = SendMessage.builder()

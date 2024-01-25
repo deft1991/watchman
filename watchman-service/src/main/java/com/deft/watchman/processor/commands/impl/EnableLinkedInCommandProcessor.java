@@ -35,7 +35,7 @@ public class EnableLinkedInCommandProcessor extends BasicCommandProcessor {
                 chatSettingsRepository.save(chatSettings);
             }
         } catch (Exception ex) {
-            log.warn("Err in EnableLinkedInCommandProcessor ex: {}", ex.getMessage());
+            log.warn("Err in " + this.getClass().getName() + " ex: {}", ex.getMessage());
         }
     }
 
