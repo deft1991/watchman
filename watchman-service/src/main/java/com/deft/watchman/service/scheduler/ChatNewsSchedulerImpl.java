@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -32,14 +33,18 @@ public class ChatNewsSchedulerImpl {
     @Async
 //    second, minute, hour, day of month, month, day(s) of week
 //    To have a job run every SUNDAY at 1 AM
-    @Scheduled(cron = "${scheduler.news.cron:0 0 1 * * SUN}")
+//    @Scheduled(cron = "${scheduler.news.cron:0 0 1 * * SUN}")
+    @Scheduled(cron = "*/10 * * * * ?")
     public void showNews() {
         Map<Long, List<String>> news = chatNewsService.getNews();
 
         news.entrySet().parallelStream().forEach(n -> {
             Long chatId = n.getKey();
             StringBuilder sb = new StringBuilder();
-            sb.append("Ааааалоха всем. А вот и еженедельный дайджест подъехал. Enjoy:");
+            sb.append("#digest от Сурового Вахтера ");
+            sb.append(LocalDate.now());
+            sb.append(" ➡\uFE0F➡\uFE0F");
+            sb.append("\n");
             sb.append("\n");
             List<String> value = n.getValue();
             for (int i = 0; i < value.size(); i++) {
