@@ -27,6 +27,7 @@ public class ChatSettings extends BaseEntity {
     private String chatName;
     private String chatLanguage;
     private boolean linkedinEnable;
+    @Builder.Default
     private int banWaitTimeSeconds = 1800;
 
 }

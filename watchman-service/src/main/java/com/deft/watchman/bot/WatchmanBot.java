@@ -211,7 +211,7 @@ public class WatchmanBot extends AbilityBot {
     }
 
     private static boolean isCommand(Update update) {
-        return update.getMessage().isCommand();
+        return update.getMessage() != null && update.getMessage().isCommand();
     }
 
     private boolean isBot(Update update) {
@@ -284,11 +284,11 @@ public class WatchmanBot extends AbilityBot {
     }
 
     private static boolean isJoinGroup(Update update) {
-        return !update.getMessage().getNewChatMembers().isEmpty();
+        return update.getMessage() != null && !update.getMessage().getNewChatMembers().isEmpty();
     }
 
     private static boolean isLeftChat(Update update) {
-        return update.getMessage().getLeftChatMember() != null;
+        return update.getMessage() != null && update.getMessage().getLeftChatMember() != null;
     }
 
 }

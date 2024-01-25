@@ -18,8 +18,8 @@ dependencies {
     implementation 'org.hibernate:hibernate-jcache:6.4.1.Final'
 
     // START JAX-B dependencies for JDK 9+
-    compileOnly 'javax.xml.bind:jaxb-api:2.3.1'
-    compileOnly 'com.sun.xml.bind:jaxb-impl:2.3.1'
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+    implementation 'com.sun.xml.bind:jaxb-impl:2.3.1'
     // END JAX-B dependencies for JDK 9+
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
