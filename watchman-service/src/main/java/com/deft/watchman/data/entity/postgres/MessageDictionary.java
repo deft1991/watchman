@@ -18,11 +18,13 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @NoArgsConstructor
 @AllArgsConstructor
 @Cacheable
-@Cache(region = "ChatMessage", usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(region = "MessageDictionary", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class MessageDictionary extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private MessageType type;
     private String message;
+    @Enumerated(EnumType.STRING)
+    private LanguageType language;
 
 }

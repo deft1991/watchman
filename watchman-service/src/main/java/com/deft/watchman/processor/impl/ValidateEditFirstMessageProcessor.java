@@ -48,15 +48,14 @@ public class ValidateEditFirstMessageProcessor implements ChatUpdateProcessor {
         User fromUser = message.getFrom();
         Long userId = fromUser.getId();
 
-        Optional<MessageDictionary> byType = messageDictionaryRepository.findByType(MessageType.WELCOME_MESSAGE);
+        Optional<MessageDictionary> byType = messageDictionaryRepository
+                .findByTypeAndLanguage(MessageType.WELCOME_MESSAGE, settings.getChatLanguage());
         MessageDictionary messageDictionary = getMessageDictionary(byType);
         /*
          * Remove user from new list
          * Say hello to new user
          * todo
-         *  parse message and find linked in link
          *  try to validate linked in link
-         *  save #whois message to reply on it later
          */
 
         Optional<ChatUser> optionalChatUser = chatUserService.findByUserIdAndChatId(userId, chat.getId());

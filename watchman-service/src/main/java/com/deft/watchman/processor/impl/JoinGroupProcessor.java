@@ -42,9 +42,11 @@ public class JoinGroupProcessor implements ChatUpdateProcessor {
     public void processUpdate(AbilityBot bot, Update update, ChatSettings settings) {
         Optional<MessageDictionary> byType;
         if (settings.isLinkedinEnable()) {
-            byType = messageDictionaryRepository.findByType(MessageType.JOIN_GROUP_MESSAGE);
+            byType = messageDictionaryRepository
+                    .findByTypeAndLanguage(MessageType.JOIN_GROUP_MESSAGE, settings.getChatLanguage());
         } else {
-            byType = messageDictionaryRepository.findByType(MessageType.JOIN_GROUP_MESSAGE_WITHOUT_LINKEDIN);
+            byType = messageDictionaryRepository
+                    .findByTypeAndLanguage(MessageType.JOIN_GROUP_MESSAGE_WITHOUT_LINKEDIN, settings.getChatLanguage());
         }
         MessageDictionary messageDictionary = getMessageDictionary(byType);
 

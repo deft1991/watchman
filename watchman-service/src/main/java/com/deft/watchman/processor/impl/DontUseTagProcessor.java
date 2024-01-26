@@ -39,7 +39,8 @@ public class DontUseTagProcessor implements ChatUpdateProcessor {
         Chat chat = message.getChat();
         User user = message.getFrom();
 
-        Optional<MessageDictionary> byType = messageDictionaryRepository.findByType(MessageType.DONT_USE_TAG);
+        Optional<MessageDictionary> byType = messageDictionaryRepository
+                .findByTypeAndLanguage(MessageType.DONT_USE_TAG, settings.getChatLanguage());
         MessageDictionary messageDictionary = getMessageDictionary(byType);
         String formatted = String.format(messageDictionary.getMessage(), user.getFirstName());
 

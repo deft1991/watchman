@@ -48,7 +48,8 @@ public class ValidateFirstMessageProcessor implements ChatUpdateProcessor {
         User fromUser = message.getFrom();
         Long userId = fromUser.getId();
 
-        Optional<MessageDictionary> byType = messageDictionaryRepository.findByType(MessageType.WELCOME_MESSAGE);
+        Optional<MessageDictionary> byType = messageDictionaryRepository
+                .findByTypeAndLanguage(MessageType.WELCOME_MESSAGE, settings.getChatLanguage());
         MessageDictionary messageDictionary = getMessageDictionary(byType);
         /*
          * Remove user from new list

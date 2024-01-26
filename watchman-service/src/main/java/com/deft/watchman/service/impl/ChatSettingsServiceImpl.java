@@ -1,6 +1,7 @@
 package com.deft.watchman.service.impl;
 
 import com.deft.watchman.data.entity.postgres.ChatSettings;
+import com.deft.watchman.data.entity.postgres.LanguageType;
 import com.deft.watchman.repository.postgres.ChatSettingsRepository;
 import com.deft.watchman.service.ChatSettingsService;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,7 @@ public class ChatSettingsServiceImpl implements ChatSettingsService {
         if (byId.isEmpty()) {
             ChatSettings chatSettings = ChatSettings.builder()
                     .chatId(chatId)
-                    .chatLanguage(defaultLanguage)
+                    .chatLanguage(LanguageType.valueOf(defaultLanguage))
                     .chatName(chatName)
                     .linkedinEnable(linkedInEnable)
                     .banWaitTimeSeconds(banWaitTimeSeconds)

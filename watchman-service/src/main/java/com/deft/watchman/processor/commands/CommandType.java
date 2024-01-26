@@ -21,7 +21,8 @@ public enum CommandType {
     TOP_RATING("Show TOP 5 users with the highest rate"),
     ENABLE_LINKEDIN("Enable LinkedIn (Only for Admins)"),
     DISABLE_LINKEDIN("Disable LinkedIn (Only for Admins)"),
-    BAN_WAIT_TIME_SECONDS("Set time before BAN user in seconds (Only for Admins)");
+    BAN_WAIT_TIME_SECONDS("Set time before BAN user in seconds (Only for Admins)"),
+    SET_LANGUAGE("Set chat language. You need to pass param. Available params: RUS/ENG (Only for Admins)");
 
     private final String description;
 }

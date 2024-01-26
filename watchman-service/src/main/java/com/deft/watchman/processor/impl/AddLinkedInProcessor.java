@@ -49,7 +49,8 @@ public class AddLinkedInProcessor implements ChatUpdateProcessor {
         if (!isNeedLinkedIn) {
             return;
         }
-        Optional<MessageDictionary> byType = messageDictionaryRepository.findByType(MessageType.ADD_LINKEDIN_MESSAGE);
+        Optional<MessageDictionary> byType = messageDictionaryRepository
+                .findByTypeAndLanguage(MessageType.ADD_LINKEDIN_MESSAGE, settings.getChatLanguage());
         MessageDictionary messageDictionary = getMessageDictionary(byType, MessageType.ADD_LINKEDIN_MESSAGE);
 
         Message message = update.getMessage();

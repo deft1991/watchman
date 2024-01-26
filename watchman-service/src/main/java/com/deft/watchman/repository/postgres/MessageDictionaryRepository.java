@@ -1,5 +1,6 @@
 package com.deft.watchman.repository.postgres;
 
+import com.deft.watchman.data.entity.postgres.LanguageType;
 import com.deft.watchman.data.entity.postgres.MessageDictionary;
 import com.deft.watchman.data.entity.postgres.MessageType;
 import jakarta.persistence.QueryHint;
@@ -17,5 +18,5 @@ import java.util.Optional;
 @Repository
 public interface MessageDictionaryRepository extends CrudRepository<MessageDictionary, Long> {
     @QueryHints(@QueryHint(name = HibernateHints.HINT_CACHEABLE, value = "true"))
-    Optional<MessageDictionary> findByType(MessageType type);
+    Optional<MessageDictionary> findByTypeAndLanguage(MessageType type, LanguageType languageType);
 }

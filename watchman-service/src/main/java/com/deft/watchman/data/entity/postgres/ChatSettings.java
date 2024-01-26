@@ -1,8 +1,6 @@
 package com.deft.watchman.data.entity.postgres;
 
-import jakarta.persistence.Cacheable;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -25,7 +23,9 @@ public class ChatSettings extends BaseEntity {
 
     private Long chatId;
     private String chatName;
-    private String chatLanguage;
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private LanguageType chatLanguage = LanguageType.ENG;
     private boolean linkedinEnable;
     @Builder.Default
     private int banWaitTimeSeconds = 1800;
