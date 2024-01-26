@@ -5,7 +5,7 @@ WORKDIR /app
 COPY . /app
 
 RUN gradle build && \
-    rm -f watchman-service/build/libs/*-plain.jar
+    rm -f multi-starter-service/build/libs/*-plain.jar
 
 # Create a JRE runtime
 FROM openjdk:21-jdk as runtime

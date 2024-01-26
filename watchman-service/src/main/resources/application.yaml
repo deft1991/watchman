@@ -81,6 +81,15 @@ scheduler:
     wait-time-seconds: 1800
   news:
     cron: '0 0 1 * * SUN'
+  message:
+    # Seconds: * (every second)
+    # Minutes: * (every minute)
+    # Hours: * (every hour)
+    # Days of the month: * (every day)
+    # Months: * (every month)
+    # Days of the week: * (every day of the week)
+    cron: '0 * * * * *' # each minute
+#    cron: '* */5 * * * *' # each 5 minute
 chat:
   default:
     language: RUS

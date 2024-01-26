@@ -2,5 +2,5 @@ rootProject.name = 'watchman'
 
 include 'watchman-service'
 include 'admin-service'
-include 'multistarter'
+include 'multi-starter-service'
 
