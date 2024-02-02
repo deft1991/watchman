@@ -18,11 +18,14 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Optional;
 
 @PageTitle("Chat News")
@@ -43,6 +46,8 @@ public class ChatNewsView extends Div implements BeforeEnterObserver {
 
     private final Button cancel = new Button("Cancel");
     private final Button save = new Button("Save");
+    private final Button addNewItem = new Button("Add News");
+    private final Button deleteItem = new Button("Delete Item");
 
     private final BeanValidationBinder<ChatNewsAdminEntity> binder;
 
@@ -85,6 +90,18 @@ public class ChatNewsView extends Div implements BeforeEnterObserver {
         // Configure Form
         binder = new BeanValidationBinder<>(ChatNewsAdminEntity.class);
 
+        StringToLongConverter plainLongConverter = new StringToLongConverter("Should be Long value") {
+            protected java.text.NumberFormat getFormat(Locale locale) {
+                NumberFormat format = super.getFormat(locale);
+                format.setGroupingUsed(false);
+                return format;
+            }
+        };
+// either set for the field or in your field factory for multiple fields
+        binder.forField(chatId)
+                .withNullRepresentation("")
+                .withConverter(plainLongConverter).bind("chatId");
+
         // Bind fields. This is where you'd define e.g. validation rules
 //        binder.forField(pages).withConverter(new StringToIntegerConverter("Only numbers are allowed")).bind("pages");
 
@@ -119,6 +136,25 @@ public class ChatNewsView extends Div implements BeforeEnterObserver {
                 Notification.show("Failed to update the data. Check again that all values are valid");
             }
         });
+
+        addNewItem.addClickListener(e -> {
+            if (chatId.getValue() != null) {
+                ChatNewsAdminEntity entity = ChatNewsAdminEntity.builder()
+                        .chatId(Long.valueOf(chatId.getValue()))
+                        .newsText(newsText.getValue())
+                        .build();
+                chatNewsAdminService.update(entity);
+                grid.getDataProvider().refreshAll();
+                Notification.show("Data saved");
+            }
+        });
+
+        deleteItem.addClickListener(e -> {
+            if (id.getValue() != null) {
+                chatNewsAdminService.delete(id.getValue());
+            }
+            grid.getDataProvider().refreshAll();
+        });
     }
 
     @Override
@@ -149,11 +185,12 @@ public class ChatNewsView extends Div implements BeforeEnterObserver {
         editorLayoutDiv.add(editorDiv);
 
         FormLayout formLayout = new FormLayout();
+        id = new TextField("News Id");
         chatId = new TextField("Chat Id");
         newsText = new TextField("News Text");
         createDate = new DateTimePicker("Create Date");
         updateDate = new DateTimePicker("Update Date");
-        formLayout.add(chatId, newsText, createDate, updateDate);
+        formLayout.add(id, chatId, newsText, createDate, updateDate);
 
         editorDiv.add(formLayout);
         createButtonLayout(editorLayoutDiv);
@@ -166,7 +203,10 @@ public class ChatNewsView extends Div implements BeforeEnterObserver {
         buttonLayout.setClassName("button-layout");
         cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonLayout.add(save, cancel);
+        addNewItem.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+        deleteItem.addThemeVariants(ButtonVariant.LUMO_ERROR);
+
+        buttonLayout.add(save, cancel, addNewItem, deleteItem);
         editorLayoutDiv.add(buttonLayout);
     }
 
