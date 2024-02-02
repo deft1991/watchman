@@ -8,9 +8,9 @@ spring:
   application:
     name: watcher-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/watcher_server
-    username: watcher_server
-    password: watcher_server
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -63,6 +63,7 @@ springdoc:
 
 telegram:
   bot:
+    token: ${TELEGRAM_BOT_TOKEN}
     userName: "Суровый Вахтер"
     ban-seconds: 60
     linkedin:

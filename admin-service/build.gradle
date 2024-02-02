@@ -11,7 +11,7 @@ configurations {
 
 dependencies {
     implementation('com.vaadin:vaadin-spring-boot-starter')
-    implementation('com.vaadin:vaadin')
+
     implementation('org.parttio:line-awesome:2.0.0')
 
     runtimeOnly 'org.postgresql:postgresql'
@@ -30,4 +30,9 @@ dependencyManagement {
     imports {
         mavenBom "com.vaadin:vaadin-bom:$vaadinVersion"
     }
+}
+
+vaadin {
+    optimizeBundle = true
+    productionMode = true
 }

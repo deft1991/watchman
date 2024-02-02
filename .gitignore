@@ -127,3 +127,5 @@ gradle-app.setting
 .classpath
 
 .env
+
+*/frontend/generated

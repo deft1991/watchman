@@ -13,7 +13,7 @@ import java.time.Instant;
  */
 
 @Entity
-@Table
+@Table(name = "bot_message")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
@@ -22,7 +22,7 @@ import java.time.Instant;
 @Cacheable
 public class BotMessageEntity extends BaseEntity {
 
-    private Long chatId;
+    private long chatId;
     private String message;
     private Instant scheduledSendTime;
     @Builder.Default

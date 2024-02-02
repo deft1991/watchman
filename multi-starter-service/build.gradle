@@ -1,9 +1,23 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { setUrl("https://maven.vaadin.com/vaadin-prereleases") }
+        maven { setUrl("https://repo.spring.io/milestone") }
+    }
+    dependencies {
+        classpath group: 'com.vaadin',
+                name: 'vaadin-gradle-plugin',
+                version: '24.3.3'
+    }
+}
+
 plugins {
     id("com.vaadin") version "24.3.3"
 }
 
 repositories {
     mavenCentral()
+    maven { setUrl("https://maven.vaadin.com/vaadin-prereleases") }
 }
 
 configurations {
@@ -29,8 +43,19 @@ dependencies {
 
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
     implementation 'com.sun.xml.bind:jaxb-impl:2.3.1'
+
+    implementation 'com.github.oshi:oshi-core:6.4.11'
+
+    implementation enforcedPlatform("com.vaadin:vaadin-bom:$vaadinVersion")
+    // Vaadin
+    implementation("com.vaadin:vaadin-core")
 }
 
 test {
     useJUnitPlatform()
+}
+
+vaadin {
+    optimizeBundle = true
+    productionMode = true
 }

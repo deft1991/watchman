@@ -6,7 +6,7 @@ import com.deft.admin.views.MainLayout;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -18,8 +18,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.converter.LocalDateToDateConverter;
-import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import org.springframework.data.domain.PageRequest;
@@ -40,8 +38,8 @@ public class ChatNewsView extends Div implements BeforeEnterObserver {
     private TextField id;
     private TextField chatId;
     private TextField newsText;
-    private DatePicker createDate;
-    private DatePicker updateDate;
+    private DateTimePicker createDate;
+    private DateTimePicker updateDate;
 
     private final Button cancel = new Button("Cancel");
     private final Button save = new Button("Save");
@@ -90,14 +88,9 @@ public class ChatNewsView extends Div implements BeforeEnterObserver {
         // Bind fields. This is where you'd define e.g. validation rules
 //        binder.forField(pages).withConverter(new StringToIntegerConverter("Only numbers are allowed")).bind("pages");
 
-        binder.forField(chatId)
-                .withNullRepresentation("")
-                .withConverter( new StringToLongConverter("Only numbers are allowed"))
-                .bind("chatId");
 
-        binder.forField(createDate).withConverter(new LocalDateToDateConverter()).bind("createDate");
-        binder.forField(createDate).withConverter(new LocalDateToDateConverter()).bind("createDate");
-        binder.forField(updateDate).withConverter(new LocalDateToDateConverter()).bind("updateDate");
+//        binder.forField(createDate).withConverter(new InstantToDateConverter()).bind("createDate");
+//        binder.forField(updateDate).withConverter(new InstantToDateConverter()).bind("updateDate");
         binder.bindInstanceFields(this);
 //        attachImageUpload(image, imagePreview);
 
@@ -158,8 +151,8 @@ public class ChatNewsView extends Div implements BeforeEnterObserver {
         FormLayout formLayout = new FormLayout();
         chatId = new TextField("Chat Id");
         newsText = new TextField("News Text");
-        createDate = new DatePicker("Create Date");
-        updateDate = new DatePicker("Update Date");
+        createDate = new DateTimePicker("Create Date");
+        updateDate = new DateTimePicker("Update Date");
         formLayout.add(chatId, newsText, createDate, updateDate);
 
         editorDiv.add(formLayout);
