@@ -1,6 +1,7 @@
 package com.deft.watchman.service.impl;
 
 import com.deft.watchman.service.WhoisParserService;
+import com.deft.watchman.util.ParserServiceHelper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

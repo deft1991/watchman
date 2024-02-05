@@ -3,6 +3,7 @@ package com.deft.watchman.service.impl;
 import com.deft.watchman.data.entity.postgres.SuggestTopic;
 import com.deft.watchman.repository.postgres.SuggestTopicRepository;
 import com.deft.watchman.service.SuggestTopicService;
+import com.deft.watchman.util.ParserServiceHelper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SuggestTopicServiceImpl implements SuggestTopicService {
 
     public static final String HASHTAG_SUGGESTION_TOPIC = "#suggest_topic";
+
     @Value("${telegram.bot.suggest-topic.pattern}")
     private String textPattern;
 

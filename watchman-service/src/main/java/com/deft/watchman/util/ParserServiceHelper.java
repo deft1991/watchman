@@ -1,4 +1,4 @@
-package com.deft.watchman.service.impl;
+package com.deft.watchman.util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

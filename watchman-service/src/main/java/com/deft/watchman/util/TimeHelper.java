@@ -1,4 +1,4 @@
-package com.deft.watchman.service.impl;
+package com.deft.watchman.util;
 
 import java.time.DayOfWeek;
 import java.time.Instant;

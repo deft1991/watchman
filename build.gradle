@@ -27,6 +27,8 @@ ext {
     redisHibernateVersion = "3.25.1"
     mapstructVersion = "1.5.5.Final"
     lombokMapstructBindingVersion = "0.2.0"
+
+    set('testcontainers.version', "1.19.4")
 }
 
 dependencies {
