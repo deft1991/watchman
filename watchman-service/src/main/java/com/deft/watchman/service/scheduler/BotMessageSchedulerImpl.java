@@ -5,6 +5,7 @@ import com.deft.watchman.service.BotMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Triple;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,6 +26,9 @@ import java.util.List;
 @EnableAsync
 @Transactional
 @RequiredArgsConstructor
+@ConditionalOnProperty(
+        value = "app.scheduling.enable", havingValue = "true", matchIfMissing = true
+)
 public class BotMessageSchedulerImpl {
 
     private final WatchmanBot watchmanBot;
@@ -42,20 +46,20 @@ public class BotMessageSchedulerImpl {
           For example bot could be kicked from the group.
           Or we got a network err. He have to try send message at least few times.
          */
-        List<String> sent = new ArrayList<>();
+        List<String> sentIds = new ArrayList<>();
         messagesToSend.parallelStream().forEach(triple -> {
             Long chatId = triple.getLeft();
             String message = triple.getMiddle();
             String messageId = triple.getRight();
-            sent.add(messageId);
+            sentIds.add(messageId);
             SendMessage inviteMessage = SendMessage.builder()
                     .chatId(String.valueOf(chatId))
                     .text(message)
                     .build();
             watchmanBot.silent().execute(inviteMessage);
         });
-        if (!sent.isEmpty()) {
-            botMessageService.markAsSent(sent);
+        if (!sentIds.isEmpty()) {
+            botMessageService.markAsSent(sentIds);
         }
     }
 }

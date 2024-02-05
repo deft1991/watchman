@@ -12,5 +12,5 @@ public interface BotMessageService {
 
     List<Triple<Long, String, String>> getMessagesToSend();
 
-    void markAsSent(List<String> sent);
+    void markAsSent(List<String> sentIds);
 }

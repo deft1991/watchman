@@ -33,8 +33,8 @@ public class BotMessageServiceImpl implements BotMessageService {
     }
 
     @Override
-    public void markAsSent(List<String> sent) {
-        botMessageRepository.markAsSent(sent);
+    public void markAsSent(List<String> sentIds) {
+        botMessageRepository.markAsSent(sentIds);
     }
 
 }

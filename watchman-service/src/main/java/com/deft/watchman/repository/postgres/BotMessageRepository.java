@@ -15,7 +15,7 @@ import java.util.List;
  * created on 26.01.2024
  */
 @Repository
-public interface BotMessageRepository extends CrudRepository<BotMessage, Long> {
+public interface BotMessageRepository extends CrudRepository<BotMessage, String> {
 
     @Query(value = """ 
             select bm from BotMessage bm
