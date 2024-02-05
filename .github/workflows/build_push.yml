@@ -131,7 +131,7 @@ jobs:
           NGINX_502_FILE: ${{ steps.docker-compose-gen.outputs.NGINX_502_FILE }}
           NGINX_CONFIG_FILE: ${{ steps.docker-compose-gen.outputs.NGINX_CONFIG_FILE }}
           NGINX_INDEX_FILE: ${{ steps.docker-compose-gen.outputs.NGINX_INDEX_FILE }}
-          SRC_DIR: "/home/ec2-user"
+          SRC_DIR: "/home/ec2-user/watchman"
         with:
           host: ${{ secrets.API_HOST }}
           username: ${{ secrets.API_USERNAME }}
