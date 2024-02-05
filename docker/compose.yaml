@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  api:
+    container_name: api
+    image: ${API_IMAGE}
+    build:
+      context: ../../../
+      dockerfile: docker/Dockerfile
+    env_file:
+      - .env
+    environment:
+      JAVA_OPTS: "-Xmx512m -Xms256m"
+      SPRING_PROFILES_ACTIVE: ${ENV:-local}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+    expose:
+      - "8080:8080"
+    restart: unless-stopped
+
+  nginx:
+    container_name: nginx
+    image: nginx:mainline-alpine-slim
+    restart: always
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./proxy/index.html:/usr/share/nginx/html/index.html:ro
+      - ./proxy/403.html:/usr/share/nginx/html/403.html:ro
+      - ./proxy/502.html:/usr/share/nginx/html/502.html:ro
+    ports:
+      - "80:80"
+
+volumes:
+  postgres:
+    name: postgres-data
