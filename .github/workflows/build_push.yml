@@ -156,8 +156,8 @@ jobs:
             echo "$ENV_FILE"  > .env
             
             # Update docker compose file
-            # yq -p=json <<<"$DOCKER_COMPOSE_FILE" > compose.yaml
-            # echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            yq -p=json <<<"$DOCKER_COMPOSE_FILE" > compose.yaml
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
             docker-compose pull api
             docker-compose up -d --remove-orphans --force-recreate
