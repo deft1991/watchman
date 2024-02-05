@@ -20,7 +20,23 @@ env:
   DOCKERFILE_PATH: './docker/'
 
 jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Test project
+        run: gradle multi-starter-service:test
+
   docker-build-push:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
