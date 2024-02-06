@@ -1,7 +1,6 @@
 package com.deft.watchman.processor.commands.impl;
 
 import com.deft.watchman.data.entity.postgres.ChatSettings;
-import com.deft.watchman.data.entity.postgres.LanguageType;
 import com.deft.watchman.processor.commands.CommandType;
 import com.deft.watchman.repository.postgres.ChatSettingsRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ChangeLanguageProcessor extends BasicCommandProcessor {
+public class BanWaitTimeCommandProcessor extends BasicCommandProcessor {
 
     private final ChatSettingsRepository chatSettingsRepository;
 
@@ -35,8 +34,11 @@ public class ChangeLanguageProcessor extends BasicCommandProcessor {
                 String text = message.getText();
                 String commandText = getCommandString(text);
                 text = text.replaceAll(commandText, "").trim();
-                LanguageType languageType = LanguageType.valueOf(text.toUpperCase());
-                chatSettings.setChatLanguage(languageType);
+                int banSeconds = Integer.parseInt(text);
+                if (banSeconds < 0) {
+                    return;
+                }
+                chatSettings.setBanWaitTimeSeconds(banSeconds);
                 chatSettingsRepository.save(chatSettings);
             }
         } catch (Exception ex) {
@@ -46,6 +48,6 @@ public class ChangeLanguageProcessor extends BasicCommandProcessor {
 
     @Override
     public CommandType getProcessorType() {
-        return CommandType.SET_LANGUAGE;
+        return CommandType.BAN_WAIT_TIME_SECONDS;
     }
 }

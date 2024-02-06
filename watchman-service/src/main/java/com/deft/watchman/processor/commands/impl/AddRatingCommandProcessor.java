@@ -23,7 +23,7 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AddRatingProcessor extends BasicCommandProcessor {
+public class AddRatingCommandProcessor extends BasicCommandProcessor {
 
     private final ChatUserService chatUserService;
 
