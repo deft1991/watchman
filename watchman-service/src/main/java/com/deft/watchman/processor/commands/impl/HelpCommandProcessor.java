@@ -33,6 +33,7 @@ public class HelpCommandProcessor extends BasicCommandProcessor {
             sb.append(" - ");
             sb.append(c.getDescription());
             sb.append("\n");
+            sb.append("\n");
         });
 
 

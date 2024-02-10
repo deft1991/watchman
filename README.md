@@ -3,6 +3,8 @@ Watchman telegram bot
 
 docker logs -f --tail 10 701a253a3a46
 
+Connect to ec2:
+```ssh -i ~/.ssh/aws_rsa ec2-user@IP```
 
 
 ### Manual CI/CD
