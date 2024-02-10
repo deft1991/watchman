@@ -3,7 +3,7 @@ name: Develop Build and Deploy
 on:
   workflow_dispatch:
     inputs:
-      build-only:
+      need-to-deploy:
         default: false
         description: 'Deploy to an instance? By default do not deploy a new image to an instance(build and push only)'
         required: false
@@ -91,7 +91,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: docker-build-push
-    if: github.event.inputs.build-only == 'false'
+    if: github.event.inputs.need-to-deploy == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
