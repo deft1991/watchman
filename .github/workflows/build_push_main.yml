@@ -47,10 +47,9 @@ jobs:
           flavor: |
             latest=auto
           tags: |
-            type=ref,event=branch
             type=ref,event=pr
-            type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{version}}
             type=sha,enable=true,priority=100,prefix=sha-,suffix=,format=short
           labels: |
             maintainer=https://github.com/deft1991
