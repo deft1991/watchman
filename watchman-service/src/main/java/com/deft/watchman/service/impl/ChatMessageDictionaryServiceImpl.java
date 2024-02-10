@@ -51,4 +51,9 @@ public class ChatMessageDictionaryServiceImpl implements ChatMessageDictionarySe
         return chatMessageDictionaryRepository
                 .findByChatIdAndTypeAndLanguage(chatId, type, languageType);
     }
+
+    @Override
+    public void save(ChatMessageDictionary chatMessageDictionary) {
+        chatMessageDictionaryRepository.save(chatMessageDictionary);
+    }
 }

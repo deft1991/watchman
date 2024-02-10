@@ -1,8 +1,8 @@
-package com.deft.watchman.processor.commands.impl;
+package com.deft.watchman.processor.commands.impl.manage;
 
 import com.deft.watchman.data.entity.postgres.ChatSettings;
-import com.deft.watchman.data.entity.postgres.LanguageType;
 import com.deft.watchman.processor.commands.CommandType;
+import com.deft.watchman.processor.commands.impl.BasicCommandProcessor;
 import com.deft.watchman.repository.postgres.ChatSettingsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,13 +15,13 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 /**
  * @author Sergey Golitsyn
- * created on 08.02.2024
+ * created on 19.01.2024
  */
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ChangeDetailedMessageCommandProcessor extends BasicCommandProcessor {
+public class EnableLinkedInCommandProcessor extends BasicCommandProcessor {
 
     private final ChatSettingsRepository chatSettingsRepository;
 
@@ -32,11 +32,7 @@ public class ChangeDetailedMessageCommandProcessor extends BasicCommandProcessor
             Chat chat = message.getChat();
             User from = message.getFrom();
             if (bot.isGroupAdmin(chat.getId(), from.getId())) {
-                String text = message.getText();
-                String commandText = getCommandString(text);
-                text = text.replaceAll(commandText, "").trim();
-                LanguageType languageType = LanguageType.valueOf(text.toUpperCase());
-                chatSettings.setChatLanguage(languageType);
+                chatSettings.setLinkedinEnable(true);
                 chatSettingsRepository.save(chatSettings);
             }
         } catch (Exception ex) {
@@ -46,6 +42,6 @@ public class ChangeDetailedMessageCommandProcessor extends BasicCommandProcessor
 
     @Override
     public CommandType getProcessorType() {
-        return CommandType.CHANGE_DETAILED_MESSAGE;
+        return CommandType.ENABLE_LINKEDIN;
     }
 }

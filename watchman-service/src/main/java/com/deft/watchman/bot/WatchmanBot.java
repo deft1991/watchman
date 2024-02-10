@@ -76,135 +76,133 @@ public class WatchmanBot extends AbilityBot {
     }
 
     /**
-     * todo give 10-30 mins for users to send invite link
+     * Receive update from telegram
      */
     @Override
     public void onUpdateReceived(Update update) {
-        if (!update.hasMessage() && !update.hasEditedMessage()) {
-            return;
-        }
-        /*
-         Do nothing if bot
-         */
-        if (isBot(update)) {
-            return;
-        }
+        if (update.hasMessage() || update.hasEditedMessage()) {
+            /*
+            Do nothing if bot
+            */
+            if (isBot(update)) {
+                return;
+            }
 
         /*
         All processors depend on ChatSettings
         We need to get or create chat settings
          */
-        ChatSettings chatSettings;
-        if (update.hasEditedMessage()) {
-            Message message = update.getEditedMessage();
-            Chat chat = message.getChat();
-            chatSettings = chatSettingsService.getChatSettings(chat.getId(), chat.getTitle());
-        } else {
-            Message message = update.getMessage();
-            Chat chat = message.getChat();
-            chatSettings = chatSettingsService.getChatSettings(chat.getId(), chat.getTitle());
-        }
-
-        if (isCommand(update)) {
-            processCommand(update, chatSettings);
-        } else if (isLeftChat(update)) {
-            executeProcessors(update, chatSettings,
-                    ProcessorType.DELETE_MESSAGE,
-                    ProcessorType.DELETE_WELCOME_MESSAGE,
-                    ProcessorType.LEAVE_GROUP,
-                    ProcessorType.DELETE_INVITE_MESSAGE);
-        } else if (isJoinGroup(update)) {
-            processJoinGroup(update, chatSettings);
-        } else if (update.hasEditedMessage()) {
-            Message message = update.getEditedMessage();
-            Chat chat = message.getChat();
-            User fromUser = message.getFrom();
-            Long userId = fromUser.getId();
-            Long chatId = chat.getId();
-
-            if (chat.isGroupChat() || chat.isSuperGroupChat()) {
-                if (isNewUser(userId, chatId)) {
-                    if (whoisParserService.containsValidTag(message.getText())
-                            && chatSettings.isLinkedinEnable()
-                            && linkedInLinkParserService.containsValidLinkedInProfileLink(message.getText())) {
-                        executeProcessors(update, chatSettings,
-                                ProcessorType.VALIDATE_EDIT_FIRST_MESSAGE,
-                                ProcessorType.DELETE_ADD_LINKEDIN_MESSAGE);
-                    } else {
-                        executeProcessors(update, chatSettings,
-                                ProcessorType.BAN_CHAT_MEMBER,
-                                ProcessorType.DELETE_MESSAGE,
-                                ProcessorType.DELETE_WELCOME_MESSAGE);
-                    }
-                }
+            ChatSettings chatSettings;
+            if (update.hasEditedMessage()) {
+                Message message = update.getEditedMessage();
+                Chat chat = message.getChat();
+                chatSettings = chatSettingsService.getChatSettings(chat.getId(), chat.getTitle());
+            } else {
+                Message message = update.getMessage();
+                Chat chat = message.getChat();
+                chatSettings = chatSettingsService.getChatSettings(chat.getId(), chat.getTitle());
             }
-        } else if (update.getMessage().hasText()) {
-            Message message = update.getMessage();
-            Chat chat = message.getChat();
-            User fromUser = message.getFrom();
-            Long userId = fromUser.getId();
 
-            if (chat.isGroupChat() || chat.isSuperGroupChat()) {
-                // Check if the user has written the welcome message
+            if (isCommand(update)) {
+                processCommand(update, chatSettings);
+            } else if (isLeftChat(update)) {
+                executeProcessors(update, chatSettings,
+                        ProcessorType.DELETE_MESSAGE,
+                        ProcessorType.DELETE_WELCOME_MESSAGE,
+                        ProcessorType.LEAVE_GROUP,
+                        ProcessorType.DELETE_INVITE_MESSAGE);
+            } else if (isJoinGroup(update)) {
+                processJoinGroup(update, chatSettings);
+            } else if (update.hasEditedMessage()) {
+                Message message = update.getEditedMessage();
+                Chat chat = message.getChat();
+                User fromUser = message.getFrom();
+                Long userId = fromUser.getId();
                 Long chatId = chat.getId();
-                /*
-                if new user
-                - check if message has TAG
-                - if no ban user
-                - if so - then check linked in link in message
-                 todo - I need to do it more flexible. I don't like a lot of if cases
-                 todo - just an idea, we can try to rewrite it to chain of responsibility
 
-                 */
-                if (isNewUser(userId, chatId)) {
-                    if (whoisParserService.containsValidTag(message.getText())) {
+                if (chat.isGroupChat() || chat.isSuperGroupChat() && isNewUser(userId, chatId)) {
+                        if (whoisParserService.containsValidTag(message.getText())
+                                && chatSettings.isLinkedinEnable()
+                                && linkedInLinkParserService.containsValidLinkedInProfileLink(message.getText())) {
+                            executeProcessors(update, chatSettings,
+                                    ProcessorType.VALIDATE_EDIT_FIRST_MESSAGE,
+                                    ProcessorType.DELETE_ADD_LINKEDIN_MESSAGE);
+                        } else {
+                            executeProcessors(update, chatSettings,
+                                    ProcessorType.BAN_CHAT_MEMBER,
+                                    ProcessorType.DELETE_MESSAGE,
+                                    ProcessorType.DELETE_WELCOME_MESSAGE);
+                        }
+
+                }
+            } else if (update.getMessage().hasText()) {
+                Message message = update.getMessage();
+                Chat chat = message.getChat();
+                User fromUser = message.getFrom();
+                Long userId = fromUser.getId();
+
+                if (chat.isGroupChat() || chat.isSuperGroupChat()) {
+                    // Check if the user has written the welcome message
+                    Long chatId = chat.getId();
+                    /*
+                    if new user
+                    - check if message has TAG
+                    - if no ban user
+                    - if so - then check linked in link in message
+                     todo - I need to do it more flexible. I don't like a lot of if cases
+                     todo - just an idea, we can try to rewrite it to chain of responsibility
+
+                     */
+                    if (isNewUser(userId, chatId)) {
+                        if (whoisParserService.containsValidTag(message.getText())) {
+                            /*
+                            If user already sent invite message
+                             */
+                            if (!isEmptyInviteMessage(userId, chatId)) {
+                                executeProcessors(update, chatSettings,
+                                        ProcessorType.DELETE_MESSAGE,
+                                        ProcessorType.DONT_USE_TAG);
+                            /*
+                            If linkedIn enabled or user sent valid linkedIn URL
+                             */
+                            } else if (!chatSettings.isLinkedinEnable() || linkedInLinkParserService.containsValidLinkedInProfileLink(message.getText())) {
+                                executeProcessors(update, chatSettings,
+                                        ProcessorType.VALIDATE_FIRST_MESSAGE,
+                                        ProcessorType.DELETE_WELCOME_MESSAGE);
+                            } else if (chatSettings.isLinkedinEnable()) {
+                                executeProcessors(update, chatSettings,
+                                        ProcessorType.DELETE_WELCOME_MESSAGE,
+                                        ProcessorType.ADD_LINKEDIN);
+                            }
+                        } else {
+                            executeProcessors(update, chatSettings,
+                                    ProcessorType.BAN_CHAT_MEMBER,
+                                    ProcessorType.DELETE_MESSAGE,
+                                    ProcessorType.DELETE_WELCOME_MESSAGE);
+                        }
+                    } else {
                         /*
-                        If user already sent invite message
+                        For old users ->
+                        if user send message with #whois tag we should remove it and show message like dont do it
                          */
-                        if (!isEmptyInviteMessage(userId, chatId)) {
+                        if (update.hasEditedMessage()) {
+                            message = update.getEditedMessage();
+                        }
+
+                        if (whoisParserService.containsValidTag(message.getText())) {
                             executeProcessors(update, chatSettings,
                                     ProcessorType.DELETE_MESSAGE,
                                     ProcessorType.DONT_USE_TAG);
-                        /*
-                        If linkedIn enabled or user sent valid linkedIn URL
-                         */
-                        } else if (!chatSettings.isLinkedinEnable() || linkedInLinkParserService.containsValidLinkedInProfileLink(message.getText())) {
-                            executeProcessors(update, chatSettings,
-                                    ProcessorType.VALIDATE_FIRST_MESSAGE,
-                                    ProcessorType.DELETE_WELCOME_MESSAGE);
-                        } else if (chatSettings.isLinkedinEnable()) {
-                            executeProcessors(update, chatSettings,
-                                    ProcessorType.DELETE_WELCOME_MESSAGE,
-                                    ProcessorType.ADD_LINKEDIN);
                         }
-                    } else {
-                        executeProcessors(update, chatSettings,
-                                ProcessorType.BAN_CHAT_MEMBER,
-                                ProcessorType.DELETE_MESSAGE,
-                                ProcessorType.DELETE_WELCOME_MESSAGE);
+                        /*
+                        Call chain of responsibility with hashTagProcessorChain
+                         */
+                        hashTagProcessorChain.check(message);
+                        /*
+                        Call statistics
+                         */
+                        processStatistics(userId, chatId, fromUser, message);
                     }
-                } else {
-                    /*
-                    For old users ->
-                    if user send message with #whois tag we should remove it and show message like dont do it
-                     */
-                    if (update.hasEditedMessage()) {
-                        message = update.getEditedMessage();
-                    }
-
-                    if (whoisParserService.containsValidTag(message.getText())) {
-                        executeProcessors(update, chatSettings,
-                                ProcessorType.DELETE_MESSAGE,
-                                ProcessorType.DONT_USE_TAG);
-                    }
-                    /*
-                    Call chain of responsibility with hashTagProcessorChain
-                     */
-                    hashTagProcessorChain.check(message);
-                    /*
-                    Call statistics
-                     */
-                    processStatistics(userId, chatId, fromUser, message);
                 }
             }
         }

@@ -1,7 +1,8 @@
-package com.deft.watchman.processor.commands.impl;
+package com.deft.watchman.processor.commands.impl.manage;
 
 import com.deft.watchman.data.entity.postgres.ChatSettings;
 import com.deft.watchman.processor.commands.CommandType;
+import com.deft.watchman.processor.commands.impl.BasicCommandProcessor;
 import com.deft.watchman.repository.postgres.ChatSettingsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

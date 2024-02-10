@@ -3,6 +3,7 @@ package com.deft.watchman.processor.commands.impl;
 import com.deft.watchman.WatchmanApplication;
 import com.deft.watchman.bot.WatchmanBot;
 import com.deft.watchman.data.entity.postgres.ChatSettings;
+import com.deft.watchman.processor.commands.impl.manage.BanWaitTimeCommandProcessor;
 import com.deft.watchman.repository.postgres.ChatSettingsRepository;
 import com.deft.watchman.testcontainer.TestContainerBase;
 import org.junit.jupiter.api.BeforeEach;

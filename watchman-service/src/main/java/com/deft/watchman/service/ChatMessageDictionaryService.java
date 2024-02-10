@@ -16,4 +16,6 @@ public interface ChatMessageDictionaryService {
      * Get Chat Message Dictionary
      */
     Optional<ChatMessageDictionary> findByChatIdAndTypeAndLanguage(Long chatId, MessageType type, LanguageType languageType);
+
+    void save(ChatMessageDictionary chatMessageDictionary);
 }

@@ -4,6 +4,7 @@ import com.deft.watchman.WatchmanApplication;
 import com.deft.watchman.bot.WatchmanBot;
 import com.deft.watchman.data.entity.postgres.ChatSettings;
 import com.deft.watchman.data.entity.postgres.LanguageType;
+import com.deft.watchman.processor.commands.impl.manage.ChangeLanguageCommandProcessor;
 import com.deft.watchman.repository.postgres.ChatSettingsRepository;
 import com.deft.watchman.testcontainer.TestContainerBase;
 import org.junit.jupiter.api.BeforeEach;
