@@ -2,6 +2,7 @@ package com.deft.watchman.processor.commands.impl;
 
 import com.deft.watchman.processor.commands.CommandProcessor;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -15,6 +16,16 @@ public abstract class BasicCommandProcessor implements CommandProcessor {
         StringBuilder sb = new StringBuilder();
         users.forEach(s -> {
             sb.append("@");
+            sb.append(s);
+            sb.append("\n");
+        });
+        return sb.toString();
+    }
+
+    @Override
+    public String getResultString(String... users) {
+        StringBuilder sb = new StringBuilder();
+        Arrays.stream(users).forEach(s -> {
             sb.append(s);
             sb.append("\n");
         });

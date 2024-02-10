@@ -1,14 +1,12 @@
 package com.deft.watchman.processor.impl;
 
+import com.deft.watchman.data.entity.postgres.ChatMessageDictionary;
 import com.deft.watchman.data.entity.postgres.ChatSettings;
-import com.deft.watchman.data.entity.postgres.MessageDictionary;
 import com.deft.watchman.data.entity.postgres.MessageType;
-import com.deft.watchman.processor.ChatUpdateProcessor;
 import com.deft.watchman.processor.ProcessorType;
 import com.deft.watchman.repository.postgres.MessageDictionaryRepository;
-import lombok.RequiredArgsConstructor;
+import com.deft.watchman.service.ChatMessageDictionaryService;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.abilitybots.api.bot.AbilityBot;
@@ -18,8 +16,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
-import java.util.Optional;
-
 /**
  * @author Sergey Golitsyn
  * created on 21.12.2023
@@ -28,10 +24,14 @@ import java.util.Optional;
 @Slf4j
 @Component
 @Transactional
-@RequiredArgsConstructor
-public class DontUseTagProcessor implements ChatUpdateProcessor {
+public class DontUseTagProcessor extends BaseDictionaryChatUpdateProcessor {
 
-    private final MessageDictionaryRepository messageDictionaryRepository;
+    private static final String DEFAULT_MESSAGE = "Hi there %s, don't use #whois in your messages. Hm, you know, you can, but you'll be banned =)";
+
+    public DontUseTagProcessor(MessageDictionaryRepository messageDictionaryRepository,
+                               ChatMessageDictionaryService chatMessageDictionaryService) {
+        super(messageDictionaryRepository, chatMessageDictionaryService);
+    }
 
     @Override
     public void processUpdate(AbilityBot bot, Update update, ChatSettings settings) {
@@ -39,9 +39,13 @@ public class DontUseTagProcessor implements ChatUpdateProcessor {
         Chat chat = message.getChat();
         User user = message.getFrom();
 
-        Optional<MessageDictionary> byType = messageDictionaryRepository
-                .findByTypeAndLanguage(MessageType.DONT_USE_TAG, settings.getChatLanguage());
-        MessageDictionary messageDictionary = getMessageDictionary(byType);
+        ChatMessageDictionary messageDictionary = super
+                .getMessageDictionary(
+                        chat.getId(),
+                        MessageType.DONT_USE_TAG,
+                        settings.getChatLanguage(),
+                        DEFAULT_MESSAGE
+                );
         String formatted = String.format(messageDictionary.getMessage(), user.getFirstName());
 
         SendMessage sendMessage = SendMessage.builder()
@@ -51,19 +55,6 @@ public class DontUseTagProcessor implements ChatUpdateProcessor {
         bot.silent().execute(sendMessage);
 
 
-    }
-
-    @NotNull
-    private static MessageDictionary getMessageDictionary(Optional<MessageDictionary> byType) {
-        MessageDictionary messageDictionary;
-        if (byType.isEmpty()) {
-            log.warn("Message with type {} is empty", MessageType.DONT_USE_TAG);
-            messageDictionary = new MessageDictionary();
-            messageDictionary.setMessage("Hi there %s, don't use #whois in your messages. Hm, you know, you can, but you'll be banned =)");
-        } else {
-            messageDictionary = byType.get();
-        }
-        return messageDictionary;
     }
 
     @Override

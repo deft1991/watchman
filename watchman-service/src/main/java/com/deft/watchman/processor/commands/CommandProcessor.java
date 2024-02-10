@@ -22,4 +22,6 @@ public interface CommandProcessor {
     String getCommandString(String message);
 
     String getResultString(List<String> users);
+
+    String getResultString(String... users);
 }

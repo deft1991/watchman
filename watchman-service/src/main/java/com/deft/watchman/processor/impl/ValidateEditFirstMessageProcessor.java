@@ -1,18 +1,16 @@
 package com.deft.watchman.processor.impl;
 
+import com.deft.watchman.data.entity.postgres.ChatMessageDictionary;
 import com.deft.watchman.data.entity.postgres.ChatSettings;
 import com.deft.watchman.data.entity.postgres.ChatUser;
-import com.deft.watchman.data.entity.postgres.MessageDictionary;
 import com.deft.watchman.data.entity.postgres.MessageType;
 import com.deft.watchman.mapper.ChatUserMapper;
-import com.deft.watchman.processor.ChatUpdateProcessor;
 import com.deft.watchman.processor.ProcessorType;
 import com.deft.watchman.repository.postgres.MessageDictionaryRepository;
+import com.deft.watchman.service.ChatMessageDictionaryService;
 import com.deft.watchman.service.ChatUserService;
 import com.deft.watchman.service.LinkedInLinkParserService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.abilitybots.api.bot.AbilityBot;
@@ -32,13 +30,25 @@ import java.util.Optional;
 @Slf4j
 @Component
 @Transactional
-@RequiredArgsConstructor
-public class ValidateEditFirstMessageProcessor implements ChatUpdateProcessor {
+public class ValidateEditFirstMessageProcessor extends BaseDictionaryChatUpdateProcessor {
 
     private final ChatUserService chatUserService;
-    private final MessageDictionaryRepository messageDictionaryRepository;
     private final ChatUserMapper chatUserMapper;
     private final LinkedInLinkParserService linkedInLinkParserService;
+
+    private static final String DEFAULT_MESSAGE = "Welcome to the group %s! Please introduce yourself by typing #whois.";
+
+    public ValidateEditFirstMessageProcessor(ChatUserService chatUserService,
+                                             MessageDictionaryRepository messageDictionaryRepository,
+                                             ChatUserMapper chatUserMapper,
+                                             LinkedInLinkParserService linkedInLinkParserService,
+                                             ChatMessageDictionaryService chatMessageDictionaryService
+    ) {
+        super(messageDictionaryRepository, chatMessageDictionaryService);
+        this.chatUserService = chatUserService;
+        this.chatUserMapper = chatUserMapper;
+        this.linkedInLinkParserService = linkedInLinkParserService;
+    }
 
 
     @Override
@@ -48,9 +58,13 @@ public class ValidateEditFirstMessageProcessor implements ChatUpdateProcessor {
         User fromUser = message.getFrom();
         Long userId = fromUser.getId();
 
-        Optional<MessageDictionary> byType = messageDictionaryRepository
-                .findByTypeAndLanguage(MessageType.WELCOME_MESSAGE, settings.getChatLanguage());
-        MessageDictionary messageDictionary = getMessageDictionary(byType);
+        ChatMessageDictionary chatMessageDictionary = super
+                .getMessageDictionary(
+                        chat.getId(),
+                        MessageType.WELCOME_MESSAGE,
+                        settings.getChatLanguage(),
+                        DEFAULT_MESSAGE
+                );
         /*
          * Remove user from new list
          * Say hello to new user
@@ -69,27 +83,13 @@ public class ValidateEditFirstMessageProcessor implements ChatUpdateProcessor {
         chatUser.setLinkedinUrl(linkedInProfileLink);
         // todo we can add other message checks
 
-        String formatted = String.format(messageDictionary.getMessage(), fromUser.getFirstName(), fromUser.getUserName());
+        String formatted = String.format(chatMessageDictionary.getMessage(), fromUser.getFirstName(), fromUser.getUserName());
         SendMessage inviteMessage = SendMessage.builder()
                 .chatId(chat.getId().toString())
                 .text(formatted)
                 .build();
         bot.silent().execute(inviteMessage);
     }
-
-    @NotNull
-    private static MessageDictionary getMessageDictionary(Optional<MessageDictionary> byType) {
-        MessageDictionary messageDictionary;
-        if (byType.isEmpty()) {
-            log.warn("Message with type {} is empty", MessageType.JOIN_GROUP_MESSAGE);
-            messageDictionary = new MessageDictionary();
-            messageDictionary.setMessage("Welcome to the group %s! Please introduce yourself by typing #whois.");
-        } else {
-            messageDictionary = byType.get();
-        }
-        return messageDictionary;
-    }
-
 
     @Override
     public ProcessorType getProcessorType() {

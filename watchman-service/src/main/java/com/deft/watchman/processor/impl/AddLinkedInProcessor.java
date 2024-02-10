@@ -1,17 +1,15 @@
 package com.deft.watchman.processor.impl;
 
+import com.deft.watchman.data.entity.postgres.ChatMessageDictionary;
 import com.deft.watchman.data.entity.postgres.ChatSettings;
 import com.deft.watchman.data.entity.postgres.ChatUser;
-import com.deft.watchman.data.entity.postgres.MessageDictionary;
 import com.deft.watchman.data.entity.postgres.MessageType;
 import com.deft.watchman.mapper.ChatUserMapper;
-import com.deft.watchman.processor.ChatUpdateProcessor;
 import com.deft.watchman.processor.ProcessorType;
 import com.deft.watchman.repository.postgres.MessageDictionaryRepository;
+import com.deft.watchman.service.ChatMessageDictionaryService;
 import com.deft.watchman.service.ChatUserService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,15 +31,24 @@ import java.util.Optional;
 @Slf4j
 @Component
 @Transactional
-@RequiredArgsConstructor
-public class AddLinkedInProcessor implements ChatUpdateProcessor {
+public class AddLinkedInProcessor extends BaseDictionaryChatUpdateProcessor {
 
     private final ChatUserService chatUserService;
     private final ChatUserMapper chatUserMapper;
-    private final MessageDictionaryRepository messageDictionaryRepository;
 
     @Value("${telegram.bot.linkedin.enable:true}")
     private boolean isNeedLinkedIn;
+
+    private static final String DEFAULT_MESSAGE = "Hi there %s, you have to add linkedIn URL. Without it you will be banned. Please change your message with #whois tag";
+
+    public AddLinkedInProcessor(ChatUserService chatUserService,
+                                ChatUserMapper chatUserMapper,
+                                MessageDictionaryRepository messageDictionaryRepository,
+                                ChatMessageDictionaryService chatMessageDictionaryService) {
+        super(messageDictionaryRepository, chatMessageDictionaryService);
+        this.chatUserService = chatUserService;
+        this.chatUserMapper = chatUserMapper;
+    }
 
 
     @Override
@@ -49,13 +56,17 @@ public class AddLinkedInProcessor implements ChatUpdateProcessor {
         if (!isNeedLinkedIn) {
             return;
         }
-        Optional<MessageDictionary> byType = messageDictionaryRepository
-                .findByTypeAndLanguage(MessageType.ADD_LINKEDIN_MESSAGE, settings.getChatLanguage());
-        MessageDictionary messageDictionary = getMessageDictionary(byType, MessageType.ADD_LINKEDIN_MESSAGE);
-
         Message message = update.getMessage();
         Chat chat = message.getChat();
         User user = message.getFrom();
+
+        ChatMessageDictionary messageDictionary = super
+                .getMessageDictionary(
+                        chat.getId(),
+                        MessageType.ADD_LINKEDIN_MESSAGE,
+                        settings.getChatLanguage(),
+                        DEFAULT_MESSAGE
+                );
 
         // Check if the new member joined the group
         if (chat.isGroupChat() || chat.isSuperGroupChat()) {
@@ -86,19 +97,6 @@ public class AddLinkedInProcessor implements ChatUpdateProcessor {
                 }
             }
         }
-    }
-
-    @NotNull
-    private static MessageDictionary getMessageDictionary(Optional<MessageDictionary> byType, MessageType type) {
-        MessageDictionary messageDictionary;
-        if (byType.isEmpty()) {
-            log.warn("Message with type {} is empty", type);
-            messageDictionary = new MessageDictionary();
-            messageDictionary.setMessage("Hi there %s, you have to add linkedIn URL. Without it you will be banned. Please change your message with #whois tag");
-        } else {
-            messageDictionary = byType.get();
-        }
-        return messageDictionary;
     }
 
     @Override
