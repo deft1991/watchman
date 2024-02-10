@@ -51,7 +51,7 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=sha
+            type=sha,enable=true,priority=100,prefix=sha-,suffix=,format=short
           labels: |
             maintainer=https://github.com/deft1991
             org.opencontainers.image.title=RunPodStableDiffusion
@@ -108,21 +108,23 @@ jobs:
         uses: appleboy/ssh-action@v1.0.0
         env:
           DOCKER_COMPOSE_FILE: ${{ steps.docker-compose-gen.outputs.DOCKER_COMPOSE_FILE }}
-          DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKER_TAG: ${{ steps.meta.outputs.tags }}
+          DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           ENV_FILE: ${{ secrets.ENV_FILE }}
           NGINX_403_FILE: ${{ steps.docker-compose-gen.outputs.NGINX_403_FILE }}
           NGINX_502_FILE: ${{ steps.docker-compose-gen.outputs.NGINX_502_FILE }}
           NGINX_CONFIG_FILE: ${{ steps.docker-compose-gen.outputs.NGINX_CONFIG_FILE }}
           NGINX_INDEX_FILE: ${{ steps.docker-compose-gen.outputs.NGINX_INDEX_FILE }}
           SRC_DIR: "/home/ec2-user/watchman"
+          API_IMAGE: ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO }}:${{ needs.docker-build-push.outputs.tag }}
         with:
           host: ${{ secrets.API_HOST }}
           username: ${{ secrets.API_USERNAME }}
           key: ${{ secrets.API_KEY }}
           port: 22
           script_stop: true
-          envs: DOCKER_COMPOSE_FILE,ENV_FILE,NGINX_CONFIG_FILE,NGINX_INDEX_FILE,NGINX_403_FILE,NGINX_502_FILE,SRC_DIR,DOCKER_PASSWORD,DOCKER_USERNAME
+          envs: API_IMAGE,DOCKER_COMPOSE_FILE,ENV_FILE,NGINX_CONFIG_FILE,NGINX_INDEX_FILE,NGINX_403_FILE,NGINX_502_FILE,SRC_DIR,DOCKER_PASSWORD,DOCKER_USERNAME
           command_timeout: 30m
           script: |
             mkdir -p "${SRC_DIR}/proxy"
