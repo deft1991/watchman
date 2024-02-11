@@ -123,7 +123,7 @@ jobs:
       - name: Login to API instance and deploy a new image
         uses: appleboy/ssh-action@v1.0.0
         env:
-          API_IMAGE: ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO }}:${{ needs.docker-build-push.outputs.tag }}
+          API_IMAGE: ${{ env.API_IMAGE_NAME }}:${{ needs.docker-build-push.outputs.tag }}
           DOCKER_COMPOSE_FILE: ${{ steps.docker-compose-gen.outputs.DOCKER_COMPOSE_FILE }}
           DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
           DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
