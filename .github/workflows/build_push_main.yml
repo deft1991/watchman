@@ -84,7 +84,6 @@ jobs:
           DOCKER_DIR: "docker"
         run: |
           echo "Generate an updated docker-compose.yaml file with new tag..."
-          ./"$SCRIPT_DIR"/update_docker_image.sh "${API_IMAGE_NAME}:${API_IMAGE_TAG}"
           
           DOCKER_COMPOSE_FILE="$(yq -o=json '.' $DOCKER_DIR/compose.yaml)"
           echo "DOCKER_COMPOSE_FILE="$(echo "$DOCKER_COMPOSE_FILE")"" >> "$GITHUB_OUTPUT"
