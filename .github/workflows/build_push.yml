@@ -69,7 +69,11 @@ jobs:
           flavor: |
             latest=auto
           tags: |
-            type=sha,enable=true,priority=100,prefix=sha-,suffix=,format=short
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,enable=true,priority=1000,prefix=sha-,suffix=,format=short
           labels: |
             maintainer=https://github.com/deft1991
             org.opencontainers.image.title=RunPodStableDiffusion
