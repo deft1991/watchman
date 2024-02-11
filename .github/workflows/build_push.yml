@@ -3,9 +3,14 @@ name: Develop Build and Deploy
 on:
   workflow_dispatch:
     inputs:
-      need-to-deploy:
+      deploy:
         default: false
         description: 'Deploy to an instance? By default do not deploy a new image to an instance(build and push only)'
+        required: false
+        type: boolean
+      tests:
+        default: true
+        description: 'Run tests'
         required: false
         type: boolean
   push:
@@ -22,6 +27,7 @@ env:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    if: github.event.inputs.tests == 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -87,7 +93,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: docker-build-push
-    if: github.event.inputs.need-to-deploy == 'true'
+    if: github.event.inputs.deploy == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
