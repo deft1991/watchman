@@ -8,11 +8,6 @@ on:
         description: 'Deploy to an instance? By default do not deploy a new image to an instance(build and push only)'
         required: false
         type: boolean
-      tests:
-        default: true
-        description: 'Run tests'
-        required: false
-        type: boolean
   push:
     branches:
       - 'develop'
@@ -27,7 +22,6 @@ env:
 jobs:
   tests:
     runs-on: ubuntu-latest
-    if: github.event.inputs.tests == 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -38,6 +32,7 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
+      
       - name: Test project
         run: gradle multi-starter-service:test
 
