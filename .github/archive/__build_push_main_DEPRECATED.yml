@@ -80,7 +80,6 @@ jobs:
         id: docker-compose-gen
         env:
           API_IMAGE_TAG: ${{ needs.docker-build-push.outputs.tag }}
-          SCRIPT_DIR: "scripts"
           DOCKER_DIR: "docker"
         run: |
           echo "Generate an updated docker-compose.yaml file with new tag..."
