@@ -134,6 +134,8 @@ jobs:
             
             # Update creds
             echo "$ENV_FILE" | base64 -d > .env
+            # remove API_IMAGE from the .env file
+            sed -i '/API_IMAGE/d' .env
             
             # Update docker compose file
             yq -p=json <<<"$DOCKER_COMPOSE_FILE" > compose.yaml
