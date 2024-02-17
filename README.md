@@ -22,7 +22,7 @@
 ## Acknowledgments
 Special thanks:
 1. Kirill Kazakov for configuring the infrastructure and assisting in CI/CD. Kir, couldn't have done it without you.
-2. Dmiriy Volykhin for your ideas and support
+2. Dmitriy Volykhin for your ideas and support
 3. The best community in https://t.me/faangtalk for tests and patience
 
 ## Contacts
