@@ -18,6 +18,7 @@ public enum CommandType {
     TOP_REPLY_FROM("Show TOP 5 users who wrote the most answered messages"),
     ADD_RATING("Add Rating to user. Format /add_rating @user_name"),
     TOP_RATING("Show TOP 5 users with the highest rate"),
+    FEEDBACK("Show feedback link"),
 
 //    Admin commands
     ENABLE_LINKEDIN("Enable LinkedIn (Only for Admins)"),
