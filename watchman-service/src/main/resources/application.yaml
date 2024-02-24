@@ -91,6 +91,10 @@ scheduler:
     # Days of the week: * (every day of the week)
     cron: '0 * * * * *' # each minute
 #    cron: '* */5 * * * *' # each 5 minute
+  feedback:
+    fixed-rate:
+      in:
+        milliseconds: 3_600_000
 chat:
   default:
     language: RUS
