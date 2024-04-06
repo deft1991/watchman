@@ -35,7 +35,7 @@ public class ChatChatRssAdvertServiceImpl implements ChatRssAdvertService {
     @Override
     public @NonNull List<RssItemDto> getRssAdvertsForChat(@NonNull Long chatId) {
         List<ChatRssAdvert> chatRssAdverts = chatRssAdvertRepository
-                .findByChatIdAndPublishedFalseAndScheduledDateBefore(
+                .getAvailableAdvertsForChat(
                         chatId, Instant.now(), PageRequest.of(0, rssAdvertSize))
                 .getContent();
         if (!chatRssAdverts.isEmpty()) {
