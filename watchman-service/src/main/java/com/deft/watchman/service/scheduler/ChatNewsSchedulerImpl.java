@@ -4,6 +4,7 @@ import com.deft.watchman.bot.WatchmanBot;
 import com.deft.watchman.service.ChatNewsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,6 +26,9 @@ import java.util.Map;
 @EnableAsync
 @Transactional
 @RequiredArgsConstructor
+@ConditionalOnProperty(
+        value = "app.scheduling.enable", havingValue = "true", matchIfMissing = true
+)
 public class ChatNewsSchedulerImpl {
 
     private final ChatNewsService chatNewsService;

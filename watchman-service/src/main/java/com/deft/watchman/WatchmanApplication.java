@@ -2,13 +2,17 @@ package com.deft.watchman;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.telegram.abilitybots.api.bot.AbilityBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.deft.*"})
+@EnableJpaRepositories(basePackages = {"com.deft.*"})
+@EntityScan(basePackages = {"com.deft.*"})
 public class WatchmanApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext ctx = SpringApplication.run(WatchmanApplication.class, args);

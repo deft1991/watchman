@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.deft'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.apptasticsoftware:rssreader:3.6.0'
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.3'
+}
+
+test {
+    useJUnitPlatform()
+}

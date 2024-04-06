@@ -3,4 +3,5 @@ rootProject.name = 'watchman'
 include 'watchman-service'
 include 'admin-service'
 include 'multi-starter-service'
+include 'rss-service'
 

@@ -95,7 +95,24 @@ scheduler:
     fixed-rate:
       in:
         milliseconds: 3_600_000
+  rss:
+    #First 0: 0 seconds (the start of the minute)
+    #Second 0: 0 minutes (the start of the hour)
+    #The next 0: 0 hours (the start of the day, midnight)
+    #  ?: no specific day of the month
+    #  *: every month
+    #MON: every Monday
+    cron: '0 0 0 ? * MON'
 chat:
   default:
     language: RUS
     linkedin-enable: true
+
+rss:
+  feed:
+    size: 5
+    posted:
+      days:
+        ago: 7
+    advert:
+      size: 1
