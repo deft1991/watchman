@@ -19,10 +19,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.telegram.abilitybots.api.bot.AbilityBot;
-import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -282,7 +279,16 @@ public class WatchmanBot extends AbilityBot {
     }
 
     private static boolean isJoinGroup(Update update) {
-        return update.getMessage() != null && !update.getMessage().getNewChatMembers().isEmpty();
+        if (update.hasMessage() && !update.getMessage().getNewChatMembers().isEmpty()) {
+            return true;
+        } else if (update.hasChatMember()) {
+            ChatMemberUpdated event = update.getChatMember();
+            String oldStatus = event.getOldChatMember().getStatus();
+            String newStatus = event.getNewChatMember().getStatus();
+            // this condition should cover cases of adding a new user to the group chat by someone
+            return (("left".equals(oldStatus) || "kicked".equals(oldStatus)) && "member".equals(newStatus));
+        }
+        return false;
     }
 
     private static boolean isLeftChat(Update update) {
