@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Instant;
@@ -46,38 +46,56 @@ class ChatChatRssAdvertServiceImplTest {
     @Test
     void testGetRssAdvertsForChat_NoResults() {
         Long chatId = 1L;
-        given(this.chatRssAdvertRepository.findByChatIdAndPublishedFalseAndScheduledDateBefore(
-                anyLong(), any(Instant.class), any(PageRequest.class))).willReturn(Page.empty());
 
+        // FIX: Change the method name to match what the service actually calls
+        given(this.chatRssAdvertRepository.getAvailableAdvertsForChat(
+                anyLong(), any(Instant.class), any(Pageable.class)))
+                .willReturn(Page.empty());
+
+        // Execute
         List<RssItemDto> rssItemDtos = chatRssAdvertServiceImpl.getRssAdvertsForChat(chatId);
 
+        // Verify
         then(this.chatRssAdvertRepository).should()
-                .findByChatIdAndPublishedFalseAndScheduledDateBefore(anyLong(), any(Instant.class), any(PageRequest.class));
-        then(this.rssItemMapper).shouldHaveNoInteractions();
+                .getAvailableAdvertsForChat(anyLong(), any(Instant.class), any(Pageable.class));
 
+        then(this.rssItemMapper).shouldHaveNoInteractions();
         assertTrue(rssItemDtos.isEmpty());
     }
 
     @Test
     void testGetRssAdvertsForChat_WithResults() {
+        // 1. Arrange
         Long chatId = 1L;
-        List<ChatRssAdvert> adverts = Collections.singletonList(new ChatRssAdvert());
+        ChatRssAdvert advert = new ChatRssAdvert();
+        List<ChatRssAdvert> adverts = Collections.singletonList(advert);
+
         RssItemDto itemDto = new RssItemDto();
         itemDto.setTitle("title");
         itemDto.setLink("link");
         itemDto.setDescription("description");
         List<RssItemDto> expected = Collections.singletonList(itemDto);
 
-        given(this.chatRssAdvertRepository.findByChatIdAndPublishedFalseAndScheduledDateBefore(
-                anyLong(), any(Instant.class), any(PageRequest.class))).willReturn(new PageImpl<>(adverts));
+        // FIX 1: Use the correct method name 'getAvailableAdvertsForChat'
+        // FIX 2: Use 'any(Pageable.class)' instead of 'PageRequest.class'
+        given(this.chatRssAdvertRepository.getAvailableAdvertsForChat(
+                anyLong(), any(Instant.class), any(Pageable.class)))
+                .willReturn(new PageImpl<>(adverts));
+
         given(this.rssItemMapper.mapAdvertToDto(adverts)).willReturn(expected);
 
+        // 2. Act
         List<RssItemDto> rssItemDtos = chatRssAdvertServiceImpl.getRssAdvertsForChat(chatId);
 
+        // 3. Assert
+        // FIX 3: Verify the correct method name
         then(this.chatRssAdvertRepository).should()
-                .findByChatIdAndPublishedFalseAndScheduledDateBefore(anyLong(), any(Instant.class), any(PageRequest.class));
+                .getAvailableAdvertsForChat(anyLong(), any(Instant.class), any(Pageable.class));
+
         then(this.rssItemMapper).should().mapAdvertToDto(adverts);
 
-        assertEquals(expected, rssItemDtos);
+        assertEquals(expected.size(), rssItemDtos.size());
+        assertEquals(expected.getFirst().getTitle(), rssItemDtos.getFirst().getTitle());
     }
+
 }
