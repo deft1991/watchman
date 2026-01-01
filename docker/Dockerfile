@@ -11,7 +11,7 @@ RUN gradle multi-starter-service:build -x test && \
     rm -f multi-starter-service/build/libs/*-plain.jar
 
 # Use a lightweight base image with Java installed
-FROM openjdk:21-jdk
+FROM eclipse-temurin:21-jdk
 
 # Set working directory in the container
 WORKDIR /app
