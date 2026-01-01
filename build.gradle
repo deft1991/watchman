@@ -55,7 +55,12 @@ subprojects {
 
     group = 'com.deft'
     version = '0.0.1-SNAPSHOT'
-    sourceCompatibility = '21'
+
+    if (name.endsWith('admin-service')) {
+        sourceCompatibility = '17'
+    } else {
+        sourceCompatibility = '21'
+    }
 
     repositories {
         mavenCentral()
