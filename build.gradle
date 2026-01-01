@@ -56,10 +56,14 @@ subprojects {
     group = 'com.deft'
     version = '0.0.1-SNAPSHOT'
 
-    if (name.endsWith('admin-service')) {
-        sourceCompatibility = '17'
-    } else {
-        sourceCompatibility = '21'
+    java {
+        if (name.endsWith('admin-service')) {
+            sourceCompatibility = JavaVersion.VERSION_17
+            targetCompatibility = JavaVersion.VERSION_17
+        } else {
+            sourceCompatibility = JavaVersion.VERSION_21
+            targetCompatibility = JavaVersion.VERSION_21
+        }
     }
 
     repositories {
