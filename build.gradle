@@ -22,7 +22,7 @@ ext {
     lombokVersion = "1.18.30"
     tomcatVersion = "11.0.0-M12"
     telegramBotVersion = "6.8.0"
-    flywayVersion = "9.22.3"
+    flywayVersion = "10.20.1"
     tomcatVersion = "11.0.0-M15"
     redisHibernateVersion = "3.25.1"
     mapstructVersion = "1.5.5.Final"
