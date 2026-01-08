@@ -22,7 +22,7 @@ ext {
     lombokVersion = "1.18.30"
     tomcatVersion = "11.0.0-M12"
     telegramBotVersion = "6.8.0"
-    flywayVersion = "10.20.1"
+    flywayVersion = "9.22.3"
     tomcatVersion = "11.0.0-M15"
     redisHibernateVersion = "3.25.1"
     mapstructVersion = "1.5.5.Final"
@@ -78,6 +78,20 @@ subprojects {
         }
         compileOnly {
             extendsFrom annotationProcessor
+        }
+    }
+
+    // Ensure a consistent Flyway version across all subprojects. Some
+    // transitive dependencies (or BOMs) can cause Gradle to select a newer
+    // flyway-core; force the version declared in the root `flywayVersion` ext
+    // property to avoid surprises (can be changed to a different strategy if
+    // you prefer to upgrade all modules to the newer Flyway).
+    configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'org.flywaydb' && details.requested.name == 'flyway-core') {
+                details.useVersion flywayVersion
+                details.because "Enforce flyway-core version from root ext.flywayVersion"
+            }
         }
     }
 
