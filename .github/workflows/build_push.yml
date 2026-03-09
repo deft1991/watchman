@@ -76,7 +76,7 @@ jobs:
             org.opencontainers.image.url=https://hub.docker.com/r/deft1991/watchman
 
       - name: Build and push to the registry
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
           cache-from: type=registry,ref=${{ env.API_IMAGE_NAME }}:buildcache
